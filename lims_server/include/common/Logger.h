@@ -6,24 +6,28 @@
 #include <Poco/FormattingChannel.h>
 #include <Poco/FileChannel.h>
 
-class Logger {
-public:
-    static Poco::Logger& getLogger() {
-        static bool initialized = false;
-        if (!initialized) {
-            // 配置日志格式（时间 + 级别 + 消息）
-            Poco::AutoPtr<Poco::PatternFormatter> formatter(new Poco::PatternFormatter("%Y-%m-%d %H:%M:%S [%p] %t"));
-            Poco::AutoPtr<Poco::FormattingChannel> channel(new Poco::FormattingChannel(formatter));
-            // 日志输出到文件（/var/log/lab_server/）
-            Poco::AutoPtr<Poco::FileChannel> fileChannel(new Poco::FileChannel);
-            fileChannel->setProperty("path", "/var/log/lab_server/server.log");
-            fileChannel->setProperty("rotation", "daily"); // 按天轮转
-            channel->setChannel(fileChannel);
-            Poco::Logger::root().setChannel(channel);
-            initialized = true;
+namespace common 
+{
+    class Logger {
+    public:
+        static Poco::Logger& getLogger() {
+            static bool initialized = false;
+            if (!initialized) {
+                // 配置日志格式（时间 + 级别 + 消息）
+                Poco::AutoPtr<Poco::PatternFormatter> formatter(new Poco::PatternFormatter("%Y-%m-%d %H:%M:%S [%p] %t"));
+                Poco::AutoPtr<Poco::FormattingChannel> channel(new Poco::FormattingChannel(formatter));
+                // 日志输出到文件（/var/log/lab_server/）
+                Poco::AutoPtr<Poco::FileChannel> fileChannel(new Poco::FileChannel);
+                fileChannel->setProperty("path", "/var/log/lab_server/server.log");
+                fileChannel->setProperty("rotation", "daily"); // 按天轮转
+                channel->setChannel(fileChannel);
+                Poco::Logger::root().setChannel(channel);
+                initialized = true;
+            }
+            return Poco::Logger::get("LabServer");
         }
-        return Poco::Logger::get("LabServer");
-    }
 };
+}
+
 
 #endif // LOGGER_H
