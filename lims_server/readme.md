@@ -10,7 +10,7 @@
 |公共模块（Common） |	工具类（日志、配置、JWT 认证等）|	POCO Util（配置）、libjwt（令牌生成）|
 
 ## 代码架构
-lab_server/
+lims_server/
 ├── include/                  # 头文件
 │   ├── network/              # 通信层头文件
 │   │   ├── TcpServer.h       # TCP服务器类
@@ -50,3 +50,21 @@ lab_server/
 │   └── init_db.sql           # 创建表结构
 ├── CMakeLists.txt            # 编译配置
 └── main.cpp                  # 程序入口
+
+## 基础开发工具
+工具 / 环境	用途	安装命令（apt）	
+g++/gcc	C++ 编译器	sudo apt install g++	推荐 9.4.0 及以上版本
+cmake	项目构建工具（管理编译流程）	sudo apt install cmake	用于解析 CMakeLists.txt，生成 Makefile
+git	版本控制（可选）	sudo apt install git	管理代码版本
+ssh	远程连接服务器（开发必备）	sudo apt install openssh-server	本地通过 SSH 连接 Linux 服务器开发
+vim/nano	终端文本编辑器	sudo apt install vim	编辑代码和配置文件
+
+## 核心系统三方库
+库名 / 软件	用途	安装命令（apt）	备注
+PostgreSQL	关系型数据库	sudo apt install postgresql postgresql-contrib	需初始化数据库并创建用户 / 表
+libpqxx-dev	PostgreSQL 的 C++ 客户端库	sudo apt install libpqxx-dev	服务端通过它操作 PostgreSQL
+libpoco-dev	C++ 轻量级框架（网络 / 配置等）	sudo apt install libpoco-dev	提供 TCP 服务器、配置解析等核心功能
+nlohmann-json3	C++ JSON 解析库（头文件）	sudo apt install nlohmann-json3-dev	解析客户端发送的 JSON 消息
+libjwt-dev	JWT 令牌生成 / 验证库（可选）	sudo apt install libjwt-dev	用于用户认证的令牌生成（后期扩展用）
+valgrind	内存泄漏检测工具（调试用）	sudo apt install valgrind	开发阶段检测内存问题
+tcpdump	网络抓包工具（调试用）	sudo apt install tcpdump	排查客户端 - 服务端通信问题

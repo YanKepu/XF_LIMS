@@ -1,21 +1,11 @@
-#ifndef DB_CONNECTION_H
-#define DB_CONNECTION_H
-
+#pragma once
 #include <pqxx/pqxx>
 #include <memory>
-#include "common/Config.h"
+#include <string>
 
-// 数据库连接池（简化版，单连接）
+// 数据库连接封装（基于libpqxx）
 class DBConnection {
 public:
-    static std::shared_ptr<pqxx::connection> getConnection() {
-        static std::shared_ptr<pqxx::connection> conn;
-        if (!conn || !conn->is_open()) {
-            std::string connStr = Config::getInstance().getDbConnectionString();
-            conn = std::make_shared<pqxx::connection>(connStr);
-        }
-        return conn;
-    }
+    static void init();  // 初始化连接参数（从配置）
+    static std::unique_ptr<pqxx::connection> create();  // 创建新连接
 };
-
-#endif // DB_CONNECTION_H

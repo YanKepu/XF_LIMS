@@ -27,54 +27,65 @@
 
 
 /* system header */
-
+#include "common/Config.h"
+#include "common/Logger.h"
+#include "common/JwtUtil.h"
+#include "dao/DBConnection.h"
+#include "network/TcpServer.h"
+#include <Poco/Exception.h>
 #include <signal.h>
 #include <iostream>
 
-/* lib header */
-#include "network/TcpServer.h"
-#include "common/Config.h"
-#include "common/Logger.h"
+// 全局退出标志
+static volatile bool g_quit = false;
 
-
-// 处理程序退出信号（如Ctrl+C）
-static TcpServer* g_server = nullptr;
-void handleSignal(int sig) {
-    if (g_server) {
-        g_server->stop();
-    }
-    exit(0);
+// 信号处理函数
+static void handleSignal(int sig) {
+    g_quit = true;
+    Logger::get().information("Received signal %d, exiting...", sig);
 }
 
 int main(int argc, char**argv) {
     try {
-        // 1. 初始化配置和日志
-        common::Config& config = Config::getInstance();     // 获取一个单例模式
-        if(!config.load("config/server.conf"))
-        {
-            std::cerr << "配置文件加载失败！ 路径 config/server.conf" << std::endl;
-            return -1;
-        }
+        // 步骤1：解析命令行参数（简化：默认配置路径）
+        std::string configPath = argc > 1 ? argv[1] : "config/server.conf";
 
-        common::Logger::getLogger(); // 初始化日志
+        // 步骤2：初始化配置
+        Config::load(configPath);
 
-        // 2. 注册退出信号处理
+        // 步骤3：初始化日志
+        Logger::init();
+        auto& log = Logger::get();
+        log.information("LIMS server starting...");
+
+        // 步骤4：初始化数据库连接
+        DBConnection::init();
+
+        // 步骤5：初始化JWT工具
+        JwtUtil::init();
+
+        // 步骤6：创建并启动TCP服务器
+        int port = Config::instance().getInt("TCP.port", 8888);
+        int threadPoolSize = Config::instance().getInt("TCP.thread_pool_size", 4);
+        TcpServer tcpServer(port, threadPoolSize);
+        tcpServer.start();
+
+        // 步骤7：注册退出信号
         signal(SIGINT, handleSignal);
         signal(SIGTERM, handleSignal);
 
-        // 3. 启动TCP服务器
-        TcpServer server;   // 创建一个实例
-        g_server = &server;     // 给全局的实例赋值
-        server.start();
-
-        // 4. 阻塞等待（保持程序运行）
-        std::cout << "服务器运行中，按Ctrl+C退出..." << std::endl;
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+        // 步骤8：阻塞等待退出信号
+        while (!g_quit) {
+            Poco::Thread::sleep(1000);
         }
+
+        // 步骤9：优雅退出
+        tcpServer.stop();
+        log.information("LIMS server exited successfully");
+        return 0;
+
     } catch (const std::exception& e) {
-        std::cerr << "启动失败: " << e.what() << std::endl;
+        std::cerr << "Fatal error: " << e.what() << std::endl;
         return 1;
     }
-    return 0;
 }
