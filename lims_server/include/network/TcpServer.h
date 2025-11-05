@@ -9,24 +9,13 @@
 
 class TcpServer {
 private:
-    Poco::Net::TCPServer server;
+    Poco::Net::TCPServer server;        // 成员变量
 
 public:
-    TcpServer() : server(new Poco::Net::TCPServerConnectionFactoryImpl<MessageHandler>(), 
-                         Poco::Net::ServerSocket(Config::getInstance().getServerPort())) {
-        // 配置线程池（最多10个线程处理并发连接）
-        server.setMaxThreads(10);
-    }
+    TcpServer();        // 构造函数
 
-    void start() {
-        server.start();
-        Logger::getLogger().information("TCP服务器启动，端口: %d", Config::getInstance().getServerPort());
-    }
-
-    void stop() {
-        server.stop();
-        Logger::getLogger().information("TCP服务器停止");
-    }
+    void start();
+    void stop();
 };
 
 #endif // TCP_SERVER_H

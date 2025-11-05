@@ -48,15 +48,20 @@ static void handleSignal(int sig) {
 int main(int argc, char**argv) {
     try {
         // 步骤1：解析命令行参数（简化：默认配置路径）
-        std::string configPath = argc > 1 ? argv[1] : "config/server.conf";
+        std::string configPath = argc > 1 ? argv[1] : "config/server.conf";     // 给于一个默认配置
 
         // 步骤2：初始化配置
-        Config::load(configPath);
+        common::Config& config = common::Config::getInstance();     // 单例模式：只有一个实例
+        if (!config.load(configPath)) 
+        {  // 从config目录加载配置
+            std::cerr << "配置文件加载失败！路径：config/server.conf" << std::endl;
+            return -1;
+        }
 
-        // 步骤3：初始化日志
-        Logger::init();
-        auto& log = Logger::get();
-        log.information("LIMS server starting...");
+        // 步骤3：初始化日志  日志先不进行实现，进行其他实现
+        // common::Logger::init();
+        // auto& log = Logger::get();
+        // log.information("LIMS server starting...");
 
         // 步骤4：初始化数据库连接
         DBConnection::init();
@@ -65,10 +70,8 @@ int main(int argc, char**argv) {
         JwtUtil::init();
 
         // 步骤6：创建并启动TCP服务器
-        int port = Config::instance().getInt("TCP.port", 8888);
-        int threadPoolSize = Config::instance().getInt("TCP.thread_pool_size", 4);
-        TcpServer tcpServer(port, threadPoolSize);
-        tcpServer.start();
+        TcpServer tcpServer;
+        tcpServer.start();      // 启动服务器
 
         // 步骤7：注册退出信号
         signal(SIGINT, handleSignal);

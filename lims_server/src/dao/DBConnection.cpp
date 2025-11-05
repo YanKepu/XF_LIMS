@@ -1,19 +1,17 @@
+#include <stdexcept>
+#include <pqxx/pqxx>  // 包含 pqxx::connection 及相关类的定义
+#include <Poco/Logger.h>
 #include "dao/DBConnection.h"
 #include "common/Config.h"
 #include "common/Logger.h"
-#include <Poco/Logger.h>
+
 
 static std::string g_conn_str;
 
 void DBConnection::init() {
-    auto& config = Config::instance();
+    auto& config = Config::getInstance();
     // 构建PostgreSQL连接字符串
-    g_conn_str = "host=" + config.getString("Database.host") +
-                 " port=" + std::to_string(config.getInt("Database.port")) +
-                 " dbname=" + config.getString("Database.dbname") +
-                 " user=" + config.getString("Database.user") +
-                 " password=" + config.getString("Database.password") +
-                 " connect_timeout=" + std::to_string(config.getInt("Database.conn_timeout"));
+    g_conn_str = config.getDbConnectionString();
     
     // 测试连接
     try {

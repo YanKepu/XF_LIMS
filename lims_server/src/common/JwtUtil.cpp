@@ -1,15 +1,15 @@
-#include "common/JwtUtil.h"
-#include "common/Config.h"
-#include "common/Logger.h"
 #include <jwt.h>
 #include <chrono>
 #include <Poco/Logger.h>
+#include "common/JwtUtil.h"
+#include "common/Config.h"
+#include "common/Logger.h"
 
 static std::string g_secret;
 static int g_expire_seconds;
 
 void JwtUtil::init() {
-    auto& config = Config::instance();
+    auto& config = Config::getInstance();
     g_secret = config.getString("JWT.secret");
     g_expire_seconds = config.getInt("JWT.expire_seconds", 86400);
     if (g_secret.empty()) {
