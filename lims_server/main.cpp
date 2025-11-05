@@ -67,7 +67,7 @@ int main(int argc, char**argv) {
         DBConnection::init();
 
         // 步骤5：初始化JWT工具
-        JwtUtil::init();
+        // JwtUtil::init();     先不用Jwt
 
         // 步骤6：创建并启动TCP服务器
         TcpServer tcpServer;
