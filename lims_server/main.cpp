@@ -41,8 +41,8 @@ static volatile bool g_quit = false;
 
 // 信号处理函数
 static void handleSignal(int sig) {
-    g_quit = true;
-    Logger::get().information("Received signal %d, exiting...", sig);
+    g_quit = true;  //  全局直接设置退出标志
+    Logger::get().information("Received signal %d, exiting...", sig);       // 日志记录
 }
 
 int main(int argc, char**argv) {
@@ -74,12 +74,12 @@ int main(int argc, char**argv) {
         tcpServer.start();      // 启动服务器
 
         // 步骤7：注册退出信号
-        signal(SIGINT, handleSignal);
+        signal(SIGINT, handleSignal);   // signal 函数用于设置信号处理函数
         signal(SIGTERM, handleSignal);
 
         // 步骤8：阻塞等待退出信号
         while (!g_quit) {
-            Poco::Thread::sleep(1000);
+            Poco::Thread::sleep(1000);  // 每秒检查一次退出标志，不接续占用CPU
         }
 
         // 步骤9：优雅退出

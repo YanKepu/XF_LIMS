@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "dao/SampleDAO.h"
-#include "models/Sample.h"
+#include "model/Sample.h"
 #include "common/Logger.h"
 
 class SampleService {

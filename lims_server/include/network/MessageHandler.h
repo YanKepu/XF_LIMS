@@ -4,7 +4,6 @@
 #include <Poco/Net/TCPServerConnection.h>
 #include <Poco/Net/StreamSocket.h>
 #include <nlohmann/json.hpp>
-#include "service/AuthService.h"
 #include "service/SampleService.h"
 #include "common/Logger.h"
 

@@ -7,6 +7,10 @@
 namespace common
 {
     class Config {
+    private:
+        Config();
+        ~Config();
+        Poco::AutoPtr<Poco::Util::PropertyFileConfiguration> config;
     public:
         // 单例模式（全局唯一配置）一个递归调用的用法
         static Config& getInstance() {
@@ -16,7 +20,7 @@ namespace common
 
         // 加载配置文件
         void load(const std::string& path) {
-            config = Poco::Util::PropertyFileConfiguration::create(path);
+            config = new Poco::Util::PropertyFileConfiguration(path);   // 智能指针无需删除
         }
 
         // 获取服务器端口
@@ -33,9 +37,6 @@ namespace common
             return "dbname=" + dbname + " user=" + user + " password=" + password + " host=" + host;
         }
 
-    private:
-        Config() = default;
-        Poco::AutoPtr<Poco::Util::PropertyFileConfiguration> config;
     };
 }
 
