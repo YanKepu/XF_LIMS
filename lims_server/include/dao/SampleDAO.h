@@ -3,6 +3,7 @@
 
 #include <pqxx/pqxx>
 #include <vector>
+#include "model/Sample.h"
 
 class SampleDAO {
 public:
