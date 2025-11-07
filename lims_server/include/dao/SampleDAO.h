@@ -14,7 +14,7 @@ public:
         try {
             txn.exec_params(
                 "INSERT INTO samples (code, name, customer, status) VALUES ($1, $2, $3, $4)",
-                sample.code, sample.name, sample.customer, sample.status
+                sample.getCode(), sample.getName(), sample.getCustomer(), sample.getStatus()
             );
             txn.commit();
             return true;

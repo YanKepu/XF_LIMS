@@ -9,7 +9,7 @@ static std::string g_secret;
 static int g_expire_seconds;
 
 void JwtUtil::init() {
-    auto& config = Config::getInstance();
+    auto& config = common::Config::getInstance();
     g_secret = config.getString("JWT.secret");
     g_expire_seconds = config.getInt("JWT.expire_seconds", 86400);
     if (g_secret.empty()) {

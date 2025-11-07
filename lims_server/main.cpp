@@ -42,7 +42,7 @@ static volatile bool g_quit = false;
 // 信号处理函数
 static void handleSignal(int sig) {
     g_quit = true;  //  全局直接设置退出标志
-    Logger::get().information("Received signal %d, exiting...", sig);       // 日志记录
+    common::Logger::getLogger().information("Received signal %d, exiting...", sig);       // 日志记录
 }
 
 int main(int argc, char**argv) {
@@ -52,16 +52,11 @@ int main(int argc, char**argv) {
 
         // 步骤2：初始化配置
         common::Config& config = common::Config::getInstance();     // 单例模式：只有一个实例
-        if (!config.load(configPath)) 
-        {  // 从config目录加载配置
-            std::cerr << "配置文件加载失败！路径：config/server.conf" << std::endl;
-            return -1;
-        }
+        config.load(configPath);
 
         // 步骤3：初始化日志  日志先不进行实现，进行其他实现
-        // common::Logger::init();
-        // auto& log = Logger::get();
-        // log.information("LIMS server starting...");
+        common::Logger * logger = new common::Logger();
+        logger->init();
 
         // 步骤4：初始化数据库连接
         DBConnection::init();
@@ -84,7 +79,6 @@ int main(int argc, char**argv) {
 
         // 步骤9：优雅退出
         tcpServer.stop();
-        log.information("LIMS server exited successfully");
         return 0;
 
     } catch (const std::exception& e) {

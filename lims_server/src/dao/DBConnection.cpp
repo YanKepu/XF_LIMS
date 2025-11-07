@@ -37,3 +37,7 @@ std::unique_ptr<pqxx::connection> DBConnection::create() {
         throw;
     }
 }
+
+std::unique_ptr<pqxx::connection> DBConnection::getConnection() {
+    return create();
+}

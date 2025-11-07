@@ -28,6 +28,8 @@ public:
 
     std::string getCode() const { return _code; }
     std::string getName() const { return _name; }
+    std::string getCustomer() const { return _customer; }
+    std::string getStatus() const { return _status; }
 };
 
 

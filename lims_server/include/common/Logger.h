@@ -10,6 +10,7 @@ namespace common
 {
     class Logger {
     public:
+        void init();
         static Poco::Logger& getLogger() {
             static bool initialized = false;
             if (!initialized) {

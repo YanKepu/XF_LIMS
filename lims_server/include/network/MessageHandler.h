@@ -12,7 +12,7 @@ using json = nlohmann::json;
 class MessageHandler : public Poco::Net::TCPServerConnection {
 private:
     // 业务服务实例
-    AuthService authService;
+    // AuthService authService;  暂时不开放用户认证
     SampleService sampleService;
 
     // 解析客户端消息
@@ -36,9 +36,10 @@ private:
 
         std::string type = request["type"];
         // 根据消息类型分发到对应业务服务
-        if (type == "user_login") {
-            return authService.login(request["data"]);
-        } else if (type == "sample_register") {
+        // if (type == "user_login") {
+        //     return authService.login(request["data"]);
+        // } else 
+        if (type == "sample_register") {
             return sampleService.registerSample(request["data"]);
         } else if (type == "sample_list") {
             return sampleService.getSampleList();
@@ -56,7 +57,7 @@ public:
         try {
             // 1. 读取客户端消息
             json request = parseMessage(socket);
-            Logger::getLogger().information("收到消息: %s", request.dump());
+            common::Logger::getLogger().information("收到消息: %s", request.dump());
 
             // 2. 处理消息
             json response = handleRequest(request);
@@ -66,7 +67,7 @@ public:
             std::string responseStr = response.dump() + "\n";
             socket.sendBytes(responseStr.data(), responseStr.size());
         } catch (const std::exception& e) {
-            Logger::getLogger().error("处理连接失败: %s", e.what());
+            common::Logger::getLogger().error("处理连接失败: %s", e.what());
             json errorResp = {{"code", 500}, {"msg", e.what()}};
             socket.sendBytes(errorResp.dump().data(), errorResp.dump().size());
         }
