@@ -5,6 +5,9 @@
 #include <Poco/PatternFormatter.h>
 #include <Poco/FormattingChannel.h>
 #include <Poco/FileChannel.h>
+#include <Poco/ConsoleChannel.h>
+#include <Poco/SplitterChannel.h>
+#include <Poco/AutoPtr.h>
 
 namespace common 
 {
@@ -27,7 +30,8 @@ namespace common
             }
             return Poco::Logger::get("LabServer");
         }
-};
+    Poco::Logger& get();
+    };
 }
 
 

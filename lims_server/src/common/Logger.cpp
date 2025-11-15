@@ -1,10 +1,9 @@
 #include "common/Logger.h"
 #include "common/Config.h"
-#include <Poco/Logger.h>
-#include <Poco/Level.h>
 
-void Logger::init() {
-    auto& config = Config::instance();
+
+void common::Logger::init() {
+    auto& config = Config::getInstance();
     
     // 格式化日志（时间+级别+消息）
     auto formatter = new Poco::PatternFormatter("%Y-%m-%d %H:%M:%S [%p] %t");
@@ -13,8 +12,9 @@ void Logger::init() {
     // 输出通道（控制台+文件）
     auto splitter = new Poco::SplitterChannel();
     
+    std::string logToConsole = config.getString("Log.console", "true");
     // 控制台输出
-    if (config.getBool("Log.console")) {
+    if (logToConsole == "true") {
         auto console = new Poco::ConsoleChannel();
         splitter->addChannel(new Poco::FormattingChannel(formatter, console));
     }
@@ -42,6 +42,6 @@ void Logger::init() {
     );
 }
 
-Poco::Logger& Logger::get() {
+Poco::Logger& common::Logger::get() {
     return Poco::Logger::get("LIMS");
 }

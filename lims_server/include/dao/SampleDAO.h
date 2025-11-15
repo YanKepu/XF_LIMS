@@ -4,6 +4,7 @@
 #include <pqxx/pqxx>
 #include <vector>
 #include "model/Sample.h"
+#include "dao/DBConnection.h"
 
 class SampleDAO {
 public:

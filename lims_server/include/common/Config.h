@@ -36,7 +36,13 @@ namespace common
             std::string host = config->getString("db.host", "localhost");
             return "dbname=" + dbname + " user=" + user + " password=" + password + " host=" + host;
         }
+        std::string getString(const std::string& key, const std::string& defaultValue = "") const {
+            return config->getString(key, defaultValue);
+        }
 
+        int getInt(const std::string& key, int defaultValue = 0) const {
+            return config->getInt(key, defaultValue);
+        }
     };
 }
 

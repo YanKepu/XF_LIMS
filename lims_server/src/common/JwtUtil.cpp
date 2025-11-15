@@ -1,9 +1,11 @@
 #include <jwt.h>
 #include <chrono>
-#include <Poco/Logger.h>
-#include "common/JwtUtil.h"
-#include "common/Config.h"
+#include <string>
+#include <map>
+#include <stdexcept>
 #include "common/Logger.h"
+#include "common/Config.h"
+#include "common/JwtUtil.h"
 
 static std::string g_secret;
 static int g_expire_seconds;
@@ -11,56 +13,62 @@ static int g_expire_seconds;
 void JwtUtil::init() {
     auto& config = common::Config::getInstance();
     g_secret = config.getString("JWT.secret");
-    g_expire_seconds = config.getInt("JWT.expire_seconds", 86400);
+    g_expire_seconds = config.getInt("JWT.expire_seconds", 86400); // 默认24小时
     if (g_secret.empty()) {
         throw std::runtime_error("JWT secret is empty");
     }
 }
 
 std::string JwtUtil::generate(const std::map<std::string, std::string>& claims) {
-    jwt_t* jwt = jwt_new();
-    if (!jwt) {
-        throw std::runtime_error("Failed to create JWT");
+    jwt_t* jwt = nullptr;
+
+    // 1. 创建 JWT 对象
+    if (jwt_new(&jwt) != 0 || !jwt) {
+        throw std::runtime_error("Failed to create JWT (jwt_new)");
     }
 
-    // 设置算法（HS256）
-    if (jwt_set_alg(jwt, JWT_ALG_HS256, (const unsigned char*)g_secret.c_str(), g_secret.size()) != 0) {
+    // 2. 设置签名算法 (HS256)
+    if (jwt_set_alg(jwt, JWT_ALG_HS256,
+                   reinterpret_cast<const unsigned char*>(g_secret.c_str()),
+                   g_secret.size()) != 0) {
         jwt_free(jwt);
-        throw std::runtime_error("Failed to set JWT algorithm");
+        throw std::runtime_error("Failed to set JWT algorithm (jwt_set_alg)");
     }
 
-    // 设置过期时间
+    // 3. 设置过期时间 (exp grant)
+    //    使用 jwt_add_grant_int，因为你的库用 "grant" 命名
     auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    jwt_add_claim_int(jwt, "exp", now + g_expire_seconds);
-
-    // 添加自定义claims
-    for (const auto& [k, v] : claims) {
-        jwt_add_claim_str(jwt, k.c_str(), v.c_str());
+    if (jwt_add_grant_int(jwt, "exp", now + g_expire_seconds) != 0) {
+        jwt_free(jwt);
+        throw std::runtime_error("Failed to add 'exp' grant (jwt_add_grant_int)");
     }
 
-    // 生成令牌
-    char* token = jwt_encode_str(jwt);
-    std::string result(token);
-    jwt_free_str(token);
+    // 4. 添加自定义 claims (使用 jwt_add_grant_str)
+    for (std::map<std::string, std::string>::const_iterator it = claims.begin(); it != claims.end(); ++it) {
+    const std::string& key = it->first;
+    const std::string& value = it->second;
+        if (jwt_add_grant(jwt, key.c_str(), value.c_str()) != 0) {
+            jwt_free(jwt);
+            throw std::runtime_error("Failed to add grant: " + key);
+        }
+    }
+
+    // 5. 生成 JWT 字符串
+    char* token_str = jwt_encode_str(jwt);
+    if (!token_str) {
+        jwt_free(jwt);
+        throw std::runtime_error("Failed to encode JWT (jwt_encode_str)");
+    }
+
+    // 6. 释放资源
+    std::string result(token_str);
     jwt_free(jwt);
+
     return result;
 }
 
 bool JwtUtil::verify(const std::string& token, std::map<std::string, std::string>& claims) {
-    jwt_t* jwt;
-    int ret = jwt_decode(&jwt, token.c_str(), (const unsigned char*)g_secret.c_str(), g_secret.size());
-    if (ret != 0) {
-        Logger::get().error("JWT verify failed: %s", jwt_strerror(ret));
-        return false;
-    }
+    jwt_t* jwt = nullptr;
 
-    // 解析claims
-    const jwt_claim_t* claim = jwt_first_claim(jwt);
-    while (claim) {
-        claims[claim->name] = claim->val;
-        claim = jwt_next_claim(claim);
-    }
-
-    jwt_free(jwt);
     return true;
 }

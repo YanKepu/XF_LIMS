@@ -4,6 +4,7 @@
 #include <Poco/Net/TCPServer.h>
 #include <Poco/Net/ServerSocket.h>
 #include <Poco/Net/TCPServerConnectionFactory.h>
+#include <Poco/Net/TCPServerParams.h>
 #include "MessageHandler.h"
 #include "common/Config.h"
 

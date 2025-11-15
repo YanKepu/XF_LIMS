@@ -9,7 +9,7 @@
 static std::string g_conn_str;
 
 void DBConnection::init() {
-    auto& config = Config::getInstance();
+    auto& config = common::Config::getInstance();
     // 构建PostgreSQL连接字符串
     g_conn_str = config.getDbConnectionString();
     
@@ -17,10 +17,10 @@ void DBConnection::init() {
     try {
         pqxx::connection test_conn(g_conn_str);
         if (test_conn.is_open()) {
-            Logger::get().information("Database connection test success");
+            // common::Logger::get().information("Database connection test success");
         }
     } catch (const std::exception& e) {
-        Logger::get().error("Database connection test failed: %s", e.what());
+        // Logger::get().error("Database connection test failed: %s", e.what());
         throw;
     }
 }
@@ -33,11 +33,11 @@ std::unique_ptr<pqxx::connection> DBConnection::create() {
         }
         return conn;
     } catch (const std::exception& e) {
-        Logger::get().error("Database connection failed: %s", e.what());
+        // Logger::get().error("Database connection failed: %s", e.what());
         throw;
     }
 }
 
-std::unique_ptr<pqxx::connection> DBConnection::getConnection() {
+std::shared_ptr<pqxx::connection> DBConnection::getConnection() {
     return create();
 }
