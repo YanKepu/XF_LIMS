@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <pqxx/pqxx>  // 包含 pqxx::connection 及相关类的定义
+#include <iostream>
 #include <Poco/Logger.h>
 #include "dao/DBConnection.h"
 #include "common/Config.h"
@@ -9,18 +10,21 @@
 static std::string g_conn_str;
 
 void DBConnection::init() {
-    auto& config = common::Config::getInstance();
+    auto& config = common::Config::getInstance();   /* 获取配置单例 */
     // 构建PostgreSQL连接字符串
-    g_conn_str = config.getDbConnectionString();
+    g_conn_str = config.getDbConnectionString();        /* 获取配置的字符串 */
     
     // 测试连接
     try {
+        /* pqxx::connection conn("host=localhost port=5432 dbname=testdb user=postgres password=yourpassword");*/
         pqxx::connection test_conn(g_conn_str);
         if (test_conn.is_open()) {
             // common::Logger::get().information("Database connection test success");
+            std::cout << "Database connection test success" << std::endl;
         }
     } catch (const std::exception& e) {
         // Logger::get().error("Database connection test failed: %s", e.what());
+        std::cout << "Database connection test failed \r\n" << std::endl;
         throw;
     }
 }

@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include <Poco/Util/PropertyFileConfiguration.h>
+#include <iostream>
 #include <string>
 
 namespace common
@@ -30,10 +31,11 @@ namespace common
 
         // 获取数据库连接信息
         std::string getDbConnectionString() const {
-            std::string dbname = config->getString("db.name", "lab_management");
-            std::string user = config->getString("db.user", "postgres");
-            std::string password = config->getString("db.password", "123456");
+            std::string dbname = config->getString("db.name", "lims_db");
+            std::string user = config->getString("db.user", "lims_user");
+            std::string password = config->getString("db.password", "secure_password");
             std::string host = config->getString("db.host", "localhost");
+
             return "dbname=" + dbname + " user=" + user + " password=" + password + " host=" + host;
         }
         std::string getString(const std::string& key, const std::string& defaultValue = "") const {

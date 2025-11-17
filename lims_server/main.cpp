@@ -52,14 +52,14 @@ int main(int argc, char**argv) {
 
         // 步骤2：初始化配置
         common::Config& config = common::Config::getInstance();     // 单例模式：只有一个实例
-        config.load(configPath);
+        config.load(configPath);            // 新的config是一个私有成员变量，是一个智能指针，自动管理内存
 
         // 步骤3：初始化日志  日志先不进行实现，进行其他实现
         common::Logger * logger = new common::Logger();
         logger->init();
 
         // 步骤4：初始化数据库连接
-        DBConnection::init();
+        DBConnection::init();       /* 调用了config的单例模式，获取配置进行数据库连接 */
 
         // 步骤5：初始化JWT工具
         // JwtUtil::init();     先不用Jwt

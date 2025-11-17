@@ -8,7 +8,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)     # 可执行文�
 # 查找依赖库
 find_package(PkgConfig REQUIRED)
 find_package(Poco REQUIRED COMPONENTS Foundation Net Util)
-pkg_check_modules(libpqxx REQUIRED)
+
+# 改为直接查找libpqxx库文件
+find_library(PQXX_LIBRARY pqxx)  # 查找pqxx库
+find_library(PQ_LIBRARY pq)      # pqxx依赖PostgreSQL的C库libpq，必须链接
+if(NOT PQXX_LIBRARY OR NOT PQ_LIBRARY)
+    message(FATAL_ERROR "libpqxx or libpq not found! Please install libpqxx-dev and libpq-dev.")
+endif()
+
 find_package(nlohmann_json REQUIRED)
 
 
@@ -28,7 +35,7 @@ message(STATUS "Found libjwt library at: ${LIBJWT_LIBRARY}")
 # 包含头文件目录
 include_directories(include)
 include_directories(/usr/include)
-include_directories(/usr/lib/x86_64-linux-gnu)
+
 
 # 收集源文件
 file(GLOB_RECURSE  SRC_FILES
@@ -53,7 +60,8 @@ target_link_libraries(lims_server
     Poco::Foundation
     Poco::Net 
     Poco::Util 
-    ${libpqxx_LIBRARIES} 
+    ${PQXX_LIBRARY}  # 链接pqxx库
+    ${PQ_LIBRARY}    # 链接依赖的libpq库
     nlohmann_json::nlohmann_json
     ${LIBJWT_LIBRARY}      # 链接 JWT 库
     pthread  # 线程库
