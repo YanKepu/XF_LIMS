@@ -48,29 +48,42 @@ static void handleSignal(int sig) {
 int main(int argc, char**argv) {
     try {
         // 步骤1：解析命令行参数（简化：默认配置路径）
+        std::cout << "Starting LIMS Server..." << std::endl;
+        std::cout << "Loading configuration..." << std::endl;
         std::string configPath = argc > 1 ? argv[1] : "config/server.conf";     // 给于一个默认配置
 
         // 步骤2：初始化配置
+        std::cout << "Initializing configuration from " + configPath << std::endl;
         common::Config& config = common::Config::getInstance();     // 单例模式：只有一个实例
         config.load(configPath);            // 新的config是一个私有成员变量，是一个智能指针，自动管理内存
+        std::cout << "Configuration loaded." << std::endl;
 
         // 步骤3：初始化日志  日志先不进行实现，进行其他实现
+        std::cout << "Initializing logger..." << std::endl;
         common::Logger * logger = new common::Logger();
         logger->init();
+        std::cout << "Logger initialized." << std::endl;
 
         // 步骤4：初始化数据库连接
+        std::cout << "Initializing database connection..." << std::endl;
         DBConnection::init();       /* 调用了config的单例模式，获取配置进行数据库连接 */
+        std::cout << "Database connection initialized." << std::endl;
 
         // 步骤5：初始化JWT工具
         // JwtUtil::init();     先不用Jwt
 
         // 步骤6：创建并启动TCP服务器
+        std::cout << "TCP server create ..." << std::endl;
         TcpServer tcpServer;
+        std::cout << "Starting TCP server..." << std::endl;
         tcpServer.start();      // 启动服务器
+        std::cout << "TCP server started." << std::endl;
 
         // 步骤7：注册退出信号
+        std::cout << "Registering signal handlers..." << std::endl;
         signal(SIGINT, handleSignal);   // signal 函数用于设置信号处理函数
         signal(SIGTERM, handleSignal);
+        std::cout << "Signal handlers registered." << std::endl;
 
         // 步骤8：阻塞等待退出信号
         while (!g_quit) {
@@ -78,7 +91,10 @@ int main(int argc, char**argv) {
         }
 
         // 步骤9：优雅退出
+        std::cout << "Shutting down TCP server..." << std::endl;
         tcpServer.stop();
+        std::cout << "TCP server shut down." << std::endl;
+        std::cout << "LIMS Server exited gracefully." << std::endl;
         return 0;
 
     } catch (const std::exception& e) {

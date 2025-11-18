@@ -1,6 +1,11 @@
-
-
 #include "network/TcpServer.h"
+
+
+
+
+TcpServer::~TcpServer(){
+    
+};
 
 TcpServer::TcpServer() : server(    // 初始化 server 成员（调用 Poco::Net::TCPServer 的构造函数）
     new Poco::Net::TCPServerConnectionFactoryImpl<MessageHandler>(),  // 连接工厂
@@ -16,11 +21,11 @@ TcpServer::TcpServer() : server(    // 初始化 server 成员（调用 Poco::Ne
 void TcpServer::start() 
 {
     server.start();
-    common::Logger::getLogger().information("TCP服务器启动，端口: %d", common::Config::getInstance().getServerPort());
+    // common::Logger::getLogger().information("TCP服务器启动，端口: %d", common::Config::getInstance().getServerPort());
 }
 
 void TcpServer::stop() 
 {
     server.stop();
-    common::Logger::getLogger().information("TCP服务器停止");
+    // common::Logger::getLogger().information("TCP服务器停止");
 }

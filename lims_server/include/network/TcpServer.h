@@ -14,6 +14,7 @@ private:
 
 public:
     TcpServer();        // 构造函数
+    ~TcpServer();       // 析构函数
 
     void start();
     void stop();

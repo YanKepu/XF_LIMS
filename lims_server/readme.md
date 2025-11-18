@@ -68,3 +68,10 @@ nlohmann-json3	C++ JSON 解析库（头文件）	sudo apt install nlohmann-json3
 libjwt-dev	JWT 令牌生成 / 验证库（可选）	sudo apt install libjwt-dev	用于用户认证的令牌生成（后期扩展用）
 valgrind	内存泄漏检测工具（调试用）	sudo apt install valgrind	开发阶段检测内存问题
 tcpdump	网络抓包工具（调试用）	sudo apt install tcpdump	排查客户端 - 服务端通信问题
+
+## 个人开发问题
+* Q1 为什么C++中常用try catch风格的代码，与C语言中的返回值判断有何差异。
+* A1 C语言的返回值判断有4个痛点。 1、容易忽略错误码判断   2、错误码需要逐层传递，容易断裂  3、需要额外维护错误码对照表
+        try  catch是强制性的，而且可以抓住构造和析构函数的错误
+        但是错误值判断在C++中仍然有用处，例如在轻量级代码中，或者性能敏感性代码中常用，try-catch有多余的开销。
+        其次是在错误可以预判值的情况下可以使用。另外在使用C兼容库中可能会涉及。
