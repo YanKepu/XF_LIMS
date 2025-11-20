@@ -1,0 +1,5 @@
+pyside6>=6.7.0
+pyinstaller>=6.3.0
+python-dotenv>=1.0.1
+loguru>=0.7.2
+dataclasses-json>=0.6.4  # 数据类与JSON互转
