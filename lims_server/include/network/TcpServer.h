@@ -12,6 +12,8 @@ class TcpServer {
 private:
     Poco::Net::TCPServer server;        // 成员变量
 
+    Poco::Net::TCPServerParams* createServerParams();
+
 public:
     TcpServer();        // 构造函数
     ~TcpServer();       // 析构函数
