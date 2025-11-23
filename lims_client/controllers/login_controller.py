@@ -15,10 +15,15 @@ class LoginController:
     def handle_login(self, username: str, password: str):
         """处理登录逻辑"""
         try:
+            # 🔴 关键：客户端先加密密码（和服务端盐值一致）
+            encrypted_pwd = User.encrypt_password(password, salt="lims@2025")
+
             # 发送登录请求到服务器
             response = tcp_client.send_request(
                 cmd="user_login",
-                data={"username": username, "password": password}
+                data={"username" : username,
+                      "password" : encrypted_pwd    # 加密传输
+                }
             )
 
             # 处理响应

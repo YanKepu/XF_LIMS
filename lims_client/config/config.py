@@ -8,8 +8,8 @@ load_dotenv()
 class Config:
     """系统配置类"""
     # TCP服务器配置
-    SERVER_HOST = os.getenv("LIMS_SERVER_HOST", "127.0.0.1")
-    SERVER_PORT = int(os.getenv("LIMS_SERVER_PORT", 8888))
+    SERVER_HOST = os.getenv("LIMS_SERVER_HOST", "152.136.97.238")
+    SERVER_PORT = int(os.getenv("LIMS_SERVER_PORT", 8080))
     # 通信超时时间（秒）
     TCP_TIMEOUT = 10
     # 日志配置
