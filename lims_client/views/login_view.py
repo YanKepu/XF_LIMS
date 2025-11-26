@@ -72,7 +72,7 @@ class LoginView(QWidget):
             QMessageBox.warning(self, "提示", "用户名和密码不能为空！")
             return
         # 发送登录信号给控制器
-        self.login_signal.emit(username, password)
+        self.login_signal.emit(username, password)      # 向信号绑定的槽函数传递消息
 
     def show_error(self, msg: str):
         """显示错误提示"""
