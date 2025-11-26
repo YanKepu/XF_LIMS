@@ -8,9 +8,9 @@ from views.main_window import MainWindow
 class LoginController:
     """登录业务控制器"""
     def __init__(self, login_view: LoginView):
-        self.login_view = login_view
-        # 绑定界面信号
-        self.login_view.login_signal.connect(self.handle_login)
+        self.login_view = login_view    # 绑定了view中的类
+
+        self.login_view.login_signal.connect(self.handle_login) # 绑定界面信号，连接视图的信号到控制器的处理方法
 
     def handle_login(self, username: str, password: str):
         """处理登录逻辑"""

@@ -40,20 +40,20 @@ def main():
     app.setStyle("Fusion")  # 设置统一样式
 
     # 创建TCP client去连接服务端
-    logger.info("尝试连接LIMS服务器...")
-    connect_success = tcp_client.connect()
-    if not connect_success:
-        # 连接失败弹窗提示
-        msg = QMessageBox(
-            QMessageBox.Warning,
-            "连接失败",
-            f"无法连接到服务器 {config.SERVER_HOST}:{config.SERVER_PORT}",
-            QMessageBox.Ok,
-            None,
-            flags=Qt.WindowStaysOnTopHint  # 弹窗置顶
-        )
-        msg.setInformativeText("请检查：\n1. 服务器地址/端口是否正确\n2. 服务器是否已启动\n3. 网络是否通畅")
-        msg.exec()
+    # logger.info("尝试连接LIMS服务器...")
+    # connect_success = tcp_client.connect()
+    # if not connect_success:
+    #     # 连接失败弹窗提示
+    #     msg = QMessageBox(
+    #         QMessageBox.Warning,
+    #         "连接失败",
+    #         f"无法连接到服务器 {config.SERVER_HOST}:{config.SERVER_PORT}",
+    #         QMessageBox.Ok,
+    #         None,
+    #         flags=Qt.WindowStaysOnTopHint  # 弹窗置顶
+    #     )
+    #     msg.setInformativeText("请检查：\n1. 服务器地址/端口是否正确\n2. 服务器是否已启动\n3. 网络是否通畅")
+    #     msg.exec()
 
     # 初始化界面和控制器
     login_view = LoginView()

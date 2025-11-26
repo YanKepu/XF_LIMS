@@ -66,8 +66,8 @@ class LoginView(QWidget):
 
     def on_login_click(self):
         """登录按钮点击事件"""
-        username = self.username_edit.text().strip()
-        password = self.password_edit.text().strip()
+        username = self.username_edit.text().strip()    # 获取用户名
+        password = self.password_edit.text().strip()    # 获取密码
         if not username or not password:
             QMessageBox.warning(self, "提示", "用户名和密码不能为空！")
             return
