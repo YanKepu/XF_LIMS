@@ -1,5 +1,6 @@
 # common/tcp_client.py
 import socket
+import datetime
 from typing import Dict, Any
 from loguru import logger
 from config.config import config
@@ -39,9 +40,10 @@ class LimsTCPClient:
 
         # 封装请求体
         request = {
-            "cmd": cmd,
-            "data": data,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                "version":"v1.0",
+                "cmd": cmd,
+                "data": data,
+                "timestamp": datetime.datetime.now(datetime.timezone.utc)       # 用utc的时间格式
         }
 
         try:

@@ -40,7 +40,35 @@ lims_client/
 
 工作之后一直在做驱动，没有做过软件方面的。
 1、密码需要加密传输
-2、
+2、登录的界面符合MVC架构即模块 界面 控制分离解耦
+
+json报文格式
+
+
+| 字段      | 类型     | 必选 | 说明             | 
+|---------|--------|----|----------------|
+| version | string | 是  | 协议版本           |
+| cmd     | string | 是  | 业务命令字（全小写_下划线） |
+| data    | object | 是  | 业务专属数据结构       |
+| seq     | string | 是  | 请求序列号 |
+| timestamp | string | 是 | 请求时间戳 |
+| token | string | 否 | 登录后的身份令牌 |
+
+~~~
+{
+    "version":"v1.0"
+        "cmd":"user_login",
+        "data":
+        {
+            "username":"admin"
+            "password":"dadgbfa"  //加密后的密码
+        }
+        “seq":"seqfdadf"   // 先不做
+        "timestamp":"2025-11-25 16:30:45"
+}
+~~~
+
+
 
 
 

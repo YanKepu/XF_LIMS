@@ -1,6 +1,7 @@
 # common/json_utils.py
 import json
 import datetime
+from datetime import date, time
 from typing import Any, Dict, Type, Callable, Optional, Tuple
 from decimal import Decimal
 
@@ -45,11 +46,11 @@ def serialize_decimal(obj: Decimal) -> str:
 # ------------------------------
 # 2. 向 SERIALIZERS 注册上述函数
 # ------------------------------
-SERIALIZERS[datetime] = serialize_datetime
+# SERIALIZERS[datetime] = serialize_datetime
 SERIALIZERS[date] = serialize_date
 SERIALIZERS[time] = serialize_time
 SERIALIZERS[Decimal] = serialize_decimal
-SERIALIZERS[Sample] = serialize_sample
+# SERIALIZERS[Sample] = serialize_sample
 
 
 # ==============================================================================
