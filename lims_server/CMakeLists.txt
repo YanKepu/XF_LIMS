@@ -43,7 +43,11 @@ file(GLOB_RECURSE  SRC_FILES
     "src/network/*.cpp" 
     "src/service/*.cpp" 
     "src/dao/*.cpp" 
-    "src/common/*.cpp")
+    "src/common/*.cpp"
+    "src/business/*.cpp"
+    "src/business/abstract/*.cpp"
+    "src/business/handler/*.cpp"
+    )
 
 # 生成可执行文件
 add_executable(lims_server main.cpp ${SRC_FILES})
@@ -70,7 +74,10 @@ target_link_libraries(lims_server
 )
 
 target_include_directories(lims_server PRIVATE ${LIBJWT_INCLUDE_DIR})
-
+# 开启Debug 模式（可选）
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 # 安装路径（可选）
 install(TARGETS lims_server DESTINATION /usr/local/bin)
 install(DIRECTORY config/ DESTINATION /etc/lims_server)

@@ -8,29 +8,26 @@
 #include <Poco/ConsoleChannel.h>
 #include <Poco/SplitterChannel.h>
 #include <Poco/AutoPtr.h>
+#include <Poco/Path.h>
+#include <Poco/File.h>
+#include <string>
 
 namespace common 
 {
     class Logger {
     public:
         void init();
-        static Poco::Logger& getLogger() {
-            static bool initialized = false;
-            if (!initialized) {
-                // 配置日志格式（时间 + 级别 + 消息）
-                Poco::AutoPtr<Poco::PatternFormatter> formatter(new Poco::PatternFormatter("%Y-%m-%d %H:%M:%S [%p] %t"));
-                Poco::AutoPtr<Poco::FormattingChannel> channel(new Poco::FormattingChannel(formatter));
-                // 日志输出到文件（/var/log/lab_server/）
-                Poco::AutoPtr<Poco::FileChannel> fileChannel(new Poco::FileChannel);
-                fileChannel->setProperty("path", "/var/log/lab_server/server.log");
-                fileChannel->setProperty("rotation", "daily"); // 按天轮转
-                channel->setChannel(fileChannel);
-                Poco::Logger::root().setChannel(channel);
-                initialized = true;
-            }
-            return Poco::Logger::get("LabServer");
-        }
-    Poco::Logger& get();
+        static Poco::Logger& getLogger();
+        Poco::Logger& get();
+    
+    private:
+        /*私有化构造函数，禁止外部实例化，仅能通过static方法使用 */
+        Logger() = default;
+        ~Logger() = default;
+
+        // 禁止拷贝
+        Logger(const Logger&) = default;
+        Logger& operator=(const Logger&) = delete;
     };
 }
 

@@ -3,8 +3,10 @@
 
 #include <Poco/Net/TCPServer.h>
 #include <Poco/Net/ServerSocket.h>
+#include <Poco/Exception.h>
 #include <Poco/Net/TCPServerConnectionFactory.h>
 #include <Poco/Net/TCPServerParams.h>
+
 #include "MessageHandler.h"
 #include "common/Config.h"
 

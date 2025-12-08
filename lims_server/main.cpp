@@ -27,14 +27,19 @@
 
 
 /* system header */
+
+#include <Poco/Exception.h>
+#include <signal.h>
+#include <iostream>
+
 #include "common/Config.h"
 #include "common/Logger.h"
 #include "common/JwtUtil.h"
 #include "dao/DBConnection.h"
 #include "network/TcpServer.h"
-#include <Poco/Exception.h>
-#include <signal.h>
-#include <iostream>
+#include "business/CommandRouter.h"
+#include "business/abstract/ICommandHandler.h"
+#include "business/handler/UserLoginHandler.h"
 
 // 全局退出标志
 static volatile bool g_quit = false;
@@ -50,7 +55,7 @@ int main(int argc, char**argv) {
         // 步骤1：解析命令行参数（简化：默认配置路径）
         std::cout << "Starting LIMS Server..." << std::endl;
         std::cout << "Loading configuration..." << std::endl;
-        std::string configPath = argc > 1 ? argv[1] : "config/server.conf";     // 给于一个默认配置
+        std::string configPath = argc > 1 ? argv[1] : "/home/ubuntu/XF_LIMS/lims_server/config/server.conf";     // 给于一个默认配置
 
         // 步骤2：初始化配置
         std::cout << "Initializing configuration from " + configPath << std::endl;
@@ -59,10 +64,15 @@ int main(int argc, char**argv) {
         std::cout << "Configuration loaded." << std::endl;
 
         // 步骤3：初始化日志  日志先不进行实现，进行其他实现
-        std::cout << "Initializing logger..." << std::endl;
-        common::Logger * logger = new common::Logger();
-        logger->init();
-        std::cout << "Logger initialized." << std::endl;
+
+        // 2. 🔥 主动注册所有业务处理器（顺序可控，无依赖风险）
+        business::CommandRouter::instance().registerHandler<business::handler::UserLoginHandler>();
+
+        // 新增模块时，只需加一行注册代码：
+        // business::CommandRouter::instance().registerHandler<business::handler::OrderQueryHandler>();
+
+        common::Logger::getLogger().information("所有业务处理器注册完成");
+
 
         // 步骤4：初始化数据库连接
         std::cout << "Initializing database connection..." << std::endl;
@@ -74,6 +84,9 @@ int main(int argc, char**argv) {
 
         // 步骤6：创建并启动TCP服务器
         std::cout << "TCP server create ..." << std::endl;
+        common::Logger::getLogger().information(
+            "TCP服务器启动，端口: %d", common::Config::getInstance().getServerPort()
+        ); 
         TcpServer tcpServer;
         std::cout << "Starting TCP server..." << std::endl;
         tcpServer.start();      // 启动服务器
