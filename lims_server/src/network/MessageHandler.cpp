@@ -93,13 +93,13 @@ void MessageHandler::run() {
             clientSocket.shutdown(); // 关闭读写
             clientSocket.close();
         }
-    } catch (Poco::Exception& e) {
-        // 捕获 Poco 库抛出的异常（如套接字错误、超时）
-        common::Logger::getLogger().error("客户端 %s 处理异常：%s", clientAddr, e.displayText());
     } catch (Poco::TimeoutException& e) {
         // 捕获超时异常
         common::Logger::getLogger().warning("客户端 %s 处理超时：%s", clientAddr, e.displayText());
-    }   
+    } catch (Poco::Exception& e) {
+        // 捕获 Poco 库抛出的异常（如套接字错误、超时）
+        common::Logger::getLogger().error("客户端 %s 处理异常：%s", clientAddr, e.displayText());
+    } 
 
     // 连接结束，打印日志
     common::Logger::getLogger().information("客户端 %s 断开连接", clientAddr);
@@ -226,33 +226,13 @@ ProcessResult MessageHandler::processData(const json& reqJson, json& response) {
         // -------------- 第四步：返回处理结果 --------------
         common::Logger::getLogger().information("业务处理完成：cmd=%s，结果=%s", cmd.c_str(), result.successflag ? "成功" : "失败");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
         return result;
     }
+    
+    return result;
     
 }
