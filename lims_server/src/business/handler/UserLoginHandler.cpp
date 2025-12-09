@@ -42,7 +42,7 @@ ProcessResult business::handler::UserLoginHandler::handle(const json& reqData, j
             FROM users 
             WHERE username = $1)
         )";   // $1 是参数占位符
-        pqxx::result res = txn.exec_params(sql);
+        pqxx::result res = txn.exec_params(sql, username);
         txn.commit();           /* 只读查询也commit，避免事务残留 */
 
         /* step 4 校验用户是否存在 */
