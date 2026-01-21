@@ -35,6 +35,10 @@ class LimsTCPClient:
         :param data: 业务数据
         :return: 服务器响应数据
         """
+        # 1. 每次请求都新建Socket（核心：不复用旧连接）
+
+        tcp_client.connect()
+
         if not self.connected and not self.connect():
             raise ConnectionError("未连接到服务器")
 

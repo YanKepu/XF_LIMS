@@ -1,28 +1,40 @@
 # controllers/login_controller.py
 from loguru import logger
 from common.tcp_client import tcp_client
-from models.user import User
+from models.user import User ,AESCrypto,PasswordCrypto, Argon2Crypto
 from views.login_view import LoginView
 from views.main_window import MainWindow
+
+# AES密钥（建议生产环境从配置文件读取，权限600）
+AES_KEY = b"0123456789ABCDEF0123456789ABCDEF"  # 32字节（256位）
 
 class LoginController:
     """登录业务控制器"""
     def __init__(self, login_view: LoginView):
         self.login_view = login_view    # 绑定了view中的类
+        self.aes = AESCrypto(AES_KEY)
+        self.argon2 = Argon2Crypto()
 
         self.login_view.login_signal.connect(self.handle_login) # 绑定界面信号，连接视图的信号到控制器的处理方法
 
     def handle_login(self, username: str, password: str):
         """处理登录逻辑"""
         try:
-            # 关键：客户端先加密密码（和服务端盐值一致）
-            encrypted_pwd = User.encrypt_password(password, salt="lims@2025")
 
-            # 发送登录请求到服务器
+            """用户登录：AES加密明文密码，传给服务端验证"""
+            # 1. AES加密明文密码（核心：传输加密后的明文，而非哈希）
+            cipher_hex, iv_hex, tag_hex = self.aes.encrypt(f"LOGIN|{username}|{password}")
+            arg2_pwd = f"{cipher_hex}|{iv_hex}|{tag_hex}"
+
+
+            # 关键：客户端先加密密码（和服务端盐值一致）  先注释掉
+            # encrypted_pwd = User.encrypt_password(password, salt="lims@2025")
+
+            # 2. TCP发送 发送登录请求到服务器
             response = tcp_client.send_request(
                 cmd="user_login",
                 data={"username" : username,
-                      "password" : encrypted_pwd    # 加密传输
+                      "password" : arg2_pwd    # 加密传输
                 }
             )
 
@@ -43,3 +55,19 @@ class LoginController:
         except Exception as e:
             logger.error(f"登录异常：{e}")
             self.login_view.show_error(f"系统异常：{str(e)}")
+
+    def handle_register(self, username: str, password: str):
+        """用户注册：生成Argon2id哈希，传给服务端存储"""
+        # 1. 生成Argon2id哈希
+        argon2_hash = self.argon2.hash_password(password)
+        # 2. 构造注册数据（AES加密哈希，避免传输泄露）
+        cipher_hex, iv_hex, tag_hex = self.aes.encrypt(f"REGISTER|{username}|{argon2_hash}")
+        arg2_pwd = f"{cipher_hex}|{iv_hex}|{tag_hex}"
+        # 3. TCP发送
+        response = tcp_client.send_request(
+            cmd="user_login",
+            data={"username": username,
+                  "password": arg2_pwd  # 加密传输
+                  }
+        )
+        print(f"注册响应：{response}")
