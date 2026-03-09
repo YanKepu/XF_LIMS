@@ -40,8 +40,14 @@ class LoginController:
 
             # 处理响应
             if response.get("code") == 200:
-                # 解析用户信息
-                user = User.from_dict(response.get("data"))
+                # 登录成功，获取 token
+                token = response.get("data", {}).get("token")
+                if not token:
+                    raise ValueError("登录成功，但未返回 token")
+
+                # 创建用户对象并保存 token
+                user = User(username=username, token=token)
+                
                 logger.info(f"用户 {username} 登录成功")
                 # 关闭登录窗口，打开主窗口
                 self.login_view.close()

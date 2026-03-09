@@ -1,0 +1,17 @@
+# Build output
+**/build/
+
+# Compiled files
+*.o
+*.a
+*.so
+
+# Log files
+*.log
+*.log.*
+
+# IDE configuration
+**/.vscode/
+
+# macOS
+.DS_Store
