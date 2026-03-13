@@ -67,6 +67,7 @@ int main(int argc, char**argv) {
 
         // 2. 🔥 主动注册所有业务处理器（顺序可控，无依赖风险）
         business::CommandRouter::instance().registerHandler<business::handler::UserLoginHandler>();
+        // business::CommandRouter::instance().registerHandler<business::handler::UserRegisterHandler>();
 
         // 新增模块时，只需加一行注册代码：
         // business::CommandRouter::instance().registerHandler<business::handler::OrderQueryHandler>();

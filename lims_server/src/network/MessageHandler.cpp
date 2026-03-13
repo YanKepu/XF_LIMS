@@ -61,7 +61,9 @@ void MessageHandler::run() {
                 /* 5. 处理业务逻辑（根据 cmd 调用不同处理函数） */
                 ProcessResult processOk = processData(reqJson, respJson);
                 
-                respJson = JsonUtil::createResponse(processOk.code, processOk.msg, processOk.data);
+                // 将 code 和 msg 添加到已包含业务数据的 respJson 中
+                respJson["code"] = processOk.code;
+                respJson["msg"] = processOk.msg;
                 std::cout << "回复报文组包完成 " << std::endl;
 
 

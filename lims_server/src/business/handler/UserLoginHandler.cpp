@@ -40,7 +40,7 @@ ProcessResult business::handler::UserLoginHandler::handle(const json& reqData, j
         std::string sql = R"(
             SELECT username, password
             FROM users 
-            WHERE username = $1)
+            WHERE username = $1
         )";   // $1 是参数占位符
         pqxx::result res = txn.exec_params(sql, username);
         txn.commit();           /* 只读查询也commit，避免事务残留 */
@@ -56,19 +56,21 @@ ProcessResult business::handler::UserLoginHandler::handle(const json& reqData, j
 
         /* step 5 提取用户数据 */
         std::string dbPassword = res[0]["password"].c_str();    /* 获取数据库存储的密码哈希值(含盐值) */
-        bool is_enable = res[0]["is_enable"].as<bool>();        /*是否启用*/
+        // bool is_enable = res[0]["is_enable"].as<bool>();        /*是否启用,先不使用这个字段*/
 
         /* step 6 验证用户可用性 */
-        if(!is_enable){
-            result.successflag = false;
-            result.code = 403;
-            result.msg = "用户已被禁用";
-            common::Logger::getLogger().error("用户登录失败（用户禁用）：%s", username.c_str());
-            return result;
-        }   
+        // if(!is_enable){
+        //     result.successflag = false;
+        //     result.code = 403;
+        //     result.msg = "用户已被禁用";
+        //     common::Logger::getLogger().error("用户登录失败（用户禁用）：%s", username.c_str());
+        //     return result;
+        // }   
 
         /* step 7 验证密码 */
-        if (bcrypt::validatePassword(password, dbPassword)) {
+        std::cout << "password: " << password << std::endl;
+        std::cout << "dbPassword: " << dbPassword << std::endl;
+        if (password == dbPassword) { // 暂时使用明文比较，后续切换为 bcrypt
             result.successflag = true;
             result.code = 200;
             result.msg = "登录成功";
@@ -84,7 +86,7 @@ ProcessResult business::handler::UserLoginHandler::handle(const json& reqData, j
         result.successflag = false;
         result.code = 500;
         result.msg = "数据库查询错误：" + std::string(e.what());
-        common::Logger::getLogger().error("UserLoginHandler SQL 错误：%s，查询：%s", e.what(), e.query().c_str());
+        common::Logger::getLogger().error("UserLoginHandler SQL 错误： %s ，查询：%s \r\n", e.what(), e.query().c_str());
     } catch (const std::exception& e) {
         result.successflag = false;
         result.code = 500;
