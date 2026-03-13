@@ -23,8 +23,9 @@ class LoginController:
 
             """用户登录：AES加密明文密码，传给服务端验证"""
             # 1. AES加密明文密码（核心：传输加密后的明文，而非哈希）
-            cipher_hex, iv_hex, tag_hex = self.aes.encrypt(f"LOGIN|{username}|{password}")
-            arg2_pwd = f"{cipher_hex}|{iv_hex}|{tag_hex}"
+            # cipher_hex, iv_hex, tag_hex = self.aes.encrypt(f"LOGIN|{username}|{password}")
+            # arg2_pwd = f"{cipher_hex}|{iv_hex}|{tag_hex}"
+            arg2_pwd = password     # 先使用明文实现功能
 
 
             # 关键：客户端先加密密码（和服务端盐值一致）  先注释掉
@@ -37,12 +38,26 @@ class LoginController:
                       "password" : arg2_pwd    # 加密传输
                 }
             )
-
+            print(response)
             # 处理响应
             if response.get("code") == 200:
                 # 解析用户信息
-                user = User.from_dict(response.get("data"))
-                logger.info(f"用户 {username} 登录成功")
+                # 登录成功，获取 token
+                token = response.get("data", {}).get("token")
+                if not token:
+                    raise ValueError("登录成功，但未返回 token")
+
+                # 创建用户对象并保存 token
+                # user = User(username=username, token=token)
+                user_data = response.get("data", {})
+                user = User(
+                    username = username,
+                    token = user_data.get("token"),
+                    role = username # user_data.get("role")
+                )
+
+                # logger.info(f"用户 {username} 登录成功")
+                logger.info(f"用户 {username} (角色: {user.role}) 登录成功")
                 # 关闭登录窗口，打开主窗口
                 self.login_view.close()
                 self.main_window = MainWindow(user)

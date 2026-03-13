@@ -208,6 +208,8 @@ def json_deserialize(json_str: str, **kwargs) -> Any:
         json.JSONDecodeError: 如果JSON字符串格式不正确。
         ValueError: 如果反序列化过程中遇到错误。
     """
+    if not json_str or not json_str.strip():
+        raise ValueError("JSON反序列化失败：接收到空响应。")
     try:
         return json.loads(json_str, cls=LIMSJSONDecoder, **kwargs)
     except json.JSONDecodeError as e:
