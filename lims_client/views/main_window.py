@@ -1,5 +1,5 @@
 # views/main_window.py
-from PySide6.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout
+from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QListWidget, QStackedWidget
 from PySide6.QtCore import Qt
 from models.user import User
 
@@ -12,21 +12,23 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         # 窗口配置
-        self.setWindowTitle(f"LIMS系统 - 主界面（{self.user.username}）")
-        self.resize(800, 600)
+        self.setWindowTitle(f"LIMS系统 - {self.user.username}")
+        self.resize(1024, 768)
 
         # 中心部件
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
-        # 布局
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
+        # 主布局
+        main_layout = QHBoxLayout(central_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
-        # 欢迎信息
-        welcome_label = QLabel(f"欢迎使用LIMS系统！\n当前用户：{self.user.username}\n角色：{self.user.role}")
-        welcome_label.setStyleSheet("font-size: 16px;")
-        welcome_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(welcome_label)
+        # 左侧导航栏
+        self.nav_bar = QListWidget()
+        self.nav_bar.setFixedWidth(150)
+        main_layout.addWidget(self.nav_bar)
 
-        central_widget.setLayout(layout)
+        # 右侧内容区
+        self.stacked_widget = QStackedWidget()
+        main_layout.addWidget(self.stacked_widget)
