@@ -38,7 +38,7 @@ ProcessResult business::handler::UserLoginHandler::handle(const json& reqData, j
         /* step 3 开启事务 */
         pqxx::work txn(*dbConn);    /* Postgre事务 */
         std::string sql = R"(
-            SELECT username, password
+            SELECT username, password, role
             FROM users 
             WHERE username = $1
         )";   // $1 是参数占位符
@@ -56,6 +56,7 @@ ProcessResult business::handler::UserLoginHandler::handle(const json& reqData, j
 
         /* step 5 提取用户数据 */
         std::string dbPassword = res[0]["password"].c_str();    /* 获取数据库存储的密码哈希值(含盐值) */
+        std::string role = res[0]["role"].c_str();
         // bool is_enable = res[0]["is_enable"].as<bool>();        /*是否启用,先不使用这个字段*/
 
         /* step 6 验证用户可用性 */
@@ -74,7 +75,7 @@ ProcessResult business::handler::UserLoginHandler::handle(const json& reqData, j
             result.successflag = true;
             result.code = 200;
             result.msg = "登录成功";
-            response["data"] = {{"token", "abcdef123456"}};     // 生产环境使用JWT
+            response["data"] = {{"token", "abcdef123456"}, {"role", role}};     // 生产环境使用JWT
             common::Logger::getLogger().information("用户登录成功：%s", username.c_str());
         } else {
             result.successflag = false;
