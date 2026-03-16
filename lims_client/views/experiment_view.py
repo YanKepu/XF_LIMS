@@ -2,9 +2,11 @@
 from PySide6.QtWidgets import (
     QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGroupBox,
     QFormLayout, QLineEdit, QPushButton, QTableWidget,
-    QHeaderView, QAbstractItemView, QDateEdit, QTextEdit, QComboBox, QTableWidgetItem, QStackedWidget
+    QHeaderView, QAbstractItemView, QDateEdit, QTextEdit, QComboBox, QTableWidgetItem, QStackedWidget, QMessageBox
 )
 from PySide6.QtCore import Qt, QDate
+
+from common.tcp_client import tcp_client # Import tcp_client
 
 class ExperimentView(QWidget):
     """实验管理视图"""
@@ -100,6 +102,7 @@ class ExperimentView(QWidget):
 
         action_buttons_layout = QHBoxLayout()
         self.create_experiment_button = QPushButton("创建实验")
+        self.create_experiment_button.clicked.connect(self._create_experiment) # Connect to new method
         self.back_to_list_button_exp = QPushButton("返回列表")
         self.back_to_list_button_exp.clicked.connect(self._show_experiment_list_view)
         action_buttons_layout.addWidget(self.create_experiment_button)
@@ -109,6 +112,57 @@ class ExperimentView(QWidget):
         container_layout.addWidget(create_experiment_group_box)
         container_layout.addStretch(1)
         self.stacked_widget.addWidget(self.create_experiment_container)
+
+    def _create_experiment(self):
+        # Collect data from form fields
+        experiment_name = self.experiment_name_input.text()
+        experiment_goal = self.experiment_goal_input.text()
+        start_date = self.start_date_edit.date().toString("yyyy-MM-dd")
+        end_date = self.end_date_edit.date().toString("yyyy-MM-dd")
+        description = self.experiment_description_input.toPlainText()
+        status = self.experiment_status_combo.currentText()
+
+        # Basic validation
+        if not all([experiment_name, experiment_goal, start_date, end_date, status]):
+            QMessageBox.warning(self, "输入错误", "请填写所有必填字段：实验名称、实验目标、开始日期、结束日期、状态。")
+            return
+
+        # Construct JSON payload
+        import json
+        payload = {
+            "action": "create_experiment",
+            "data": {
+                "experiment_name": experiment_name,
+                "experiment_goal": experiment_goal,
+                "start_date": start_date,
+                "end_date": end_date,
+                "description": description,
+                "status": status
+            }
+        }
+
+        # Send message to server
+        response = tcp_client.send_message(json.dumps(payload))
+        if response:
+            try:
+                response_data = json.loads(response)
+                if response_data.get("status") == "success":
+                    QMessageBox.information(self, "成功", response_data.get("message", "实验创建成功！"))
+                    # Clear form fields
+                    self.experiment_name_input.clear()
+                    self.experiment_goal_input.clear()
+                    self.experiment_description_input.clear()
+                    self.start_date_edit.setDate(QDate.currentDate())
+                    self.end_date_edit.setDate(QDate.currentDate().addDays(7))
+                    self.experiment_status_combo.setCurrentIndex(0)
+                    self.back_to_list_button_exp.click() # Go back to list view
+                else:
+                    QMessageBox.warning(self, "失败", response_data.get("message", "实验创建失败！"))
+            except json.JSONDecodeError:
+                QMessageBox.critical(self, "错误", "服务器响应格式错误。")
+        else:
+            QMessageBox.critical(self, "错误", "未能收到服务器响应或连接失败。")
+
 
     def _show_create_experiment_view(self):
         self.stacked_widget.setCurrentWidget(self.create_experiment_container)
