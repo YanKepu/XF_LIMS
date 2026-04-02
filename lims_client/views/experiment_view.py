@@ -4,12 +4,13 @@ from PySide6.QtWidgets import (
     QFormLayout, QLineEdit, QPushButton, QTableWidget,
     QHeaderView, QAbstractItemView, QDateEdit, QTextEdit, QComboBox, QTableWidgetItem, QStackedWidget, QMessageBox
 )
-from PySide6.QtCore import Qt, QDate
-
-from common.tcp_client import tcp_client # Import tcp_client
+from PySide6.QtCore import Qt, QDate, Signal
 
 class ExperimentView(QWidget):
     """实验管理视图"""
+    # Define a signal that will carry a dictionary payload
+    create_experiment_signal = Signal(dict)
+
     def __init__(self):
         super().__init__()
         self.main_layout = QVBoxLayout(self)
@@ -114,7 +115,13 @@ class ExperimentView(QWidget):
         self.stacked_widget.addWidget(self.create_experiment_container)
 
     def _create_experiment(self):
-        # Collect data from form fields
+        """Gathers form data and emits a signal to the controller."""
+        data = self.get_form_data()
+        if data:
+            self.create_experiment_signal.emit(data)
+
+    def get_form_data(self) -> dict | None:
+        """Collects and validates data from the form fields."""
         experiment_name = self.experiment_name_input.text()
         experiment_goal = self.experiment_goal_input.text()
         start_date = self.start_date_edit.date().toString("yyyy-MM-dd")
@@ -122,46 +129,40 @@ class ExperimentView(QWidget):
         description = self.experiment_description_input.toPlainText()
         status = self.experiment_status_combo.currentText()
 
-        # Basic validation
         if not all([experiment_name, experiment_goal, start_date, end_date, status]):
-            QMessageBox.warning(self, "输入错误", "请填写所有必填字段：实验名称、实验目标、开始日期、结束日期、状态。")
-            return
+            self.show_message("输入错误", "请填写所有必填字段。", msg_type='warning')
+            return None
 
-        # Construct JSON payload
-        import json
-        payload = {
-            "action": "create_experiment",
-            "data": {
-                "experiment_name": experiment_name,
-                "experiment_goal": experiment_goal,
-                "start_date": start_date,
-                "end_date": end_date,
-                "description": description,
-                "status": status
-            }
+        return {
+            "experiment_name": experiment_name,
+            "experiment_goal": experiment_goal,
+            "start_date": start_date,
+            "end_date": end_date,
+            "description": description,
+            "status": status
         }
 
-        # Send message to server
-        response = tcp_client.send_message(json.dumps(payload))
-        if response:
-            try:
-                response_data = json.loads(response)
-                if response_data.get("status") == "success":
-                    QMessageBox.information(self, "成功", response_data.get("message", "实验创建成功！"))
-                    # Clear form fields
-                    self.experiment_name_input.clear()
-                    self.experiment_goal_input.clear()
-                    self.experiment_description_input.clear()
-                    self.start_date_edit.setDate(QDate.currentDate())
-                    self.end_date_edit.setDate(QDate.currentDate().addDays(7))
-                    self.experiment_status_combo.setCurrentIndex(0)
-                    self.back_to_list_button_exp.click() # Go back to list view
-                else:
-                    QMessageBox.warning(self, "失败", response_data.get("message", "实验创建失败！"))
-            except json.JSONDecodeError:
-                QMessageBox.critical(self, "错误", "服务器响应格式错误。")
-        else:
-            QMessageBox.critical(self, "错误", "未能收到服务器响应或连接失败。")
+    def clear_form(self):
+        """Clears all input fields in the create experiment form."""
+        self.experiment_name_input.clear()
+        self.experiment_goal_input.clear()
+        self.experiment_description_input.clear()
+        self.start_date_edit.setDate(QDate.currentDate())
+        self.end_date_edit.setDate(QDate.currentDate().addDays(7))
+        self.experiment_status_combo.setCurrentIndex(0)
+
+    def show_message(self, title, text, msg_type='info'):
+        """Displays a message box."""
+        if msg_type == 'info':
+            QMessageBox.information(self, title, text)
+        elif msg_type == 'warning':
+            QMessageBox.warning(self, title, text)
+        elif msg_type == 'critical':
+            QMessageBox.critical(self, title, text)
+
+    def switch_to_list_view(self):
+        """Switches the stacked widget to the experiment list view."""
+        self.stacked_widget.setCurrentWidget(self.experiment_list_container)
 
 
     def _show_create_experiment_view(self):

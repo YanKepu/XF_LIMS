@@ -61,6 +61,10 @@ class LoginController:
                 # 关闭登录窗口，打开主窗口
                 self.login_view.close()
                 self.main_window = MainWindow(user)
+
+                # 为主窗口中的视图创建并绑定控制器
+                self.experiment_controller = ExperimentController(self.main_window.experiment_view)
+
                 self.main_window.show()
             else:
                 self.login_view.show_error(f"登录失败：{response.get('msg', '未知错误')}")

@@ -104,3 +104,17 @@
   3. 在各自的创建/登记表单中添加了“返回列表”按钮，方便用户切换视图。
 - **结果**: “实验管理”和“样本管理”模块的UI交互逻辑已根据用户要求优化。
 - **后续步骤**: 运行应用程序进行功能验证。
+
+---
+
+**日志条目 #8**
+
+- **日期**: 2026-04-02
+- **任务**: 调试客户端与服务端的通信，并完善实验管理模块的通信协议标准。
+- **决策/行动**:
+  1. **问题定位**: 分析了客户端运行时抛出的 `AttributeError: 'LimsTCPClient' object has no attribute 'send_message'` 错误，定位到 `experiment_view.py` 中使用了错误的方法名。
+  2. **架构讨论**: 深入讨论了 `send_message` (低层级) 与 `send_request` (高层级) 两种方法的优劣，并确定 `send_request` 作为标准方法，因为它提供了更好的封装和抽象，降低了调用方的复杂度。
+  3. **代码修复**: 修复了 `lims_client/views/experiment_view.py` 中的 `_create_experiment` 方法，将其调用方式从 `tcp_client.send_message` 修改为正确的 `tcp_client.send_request(cmd, data)`，并适配了新的响应结构和错误处理逻辑。
+  4. **协议完善**: 在 `AI-Helper/Standards_Communication.md` 文件中，为实验管理模块补充了获取列表 (`get_experiment_list`)、更新 (`update_experiment`) 和删除 (`delete_experiment`) 操作的JSON通信协议标准。
+- **结果**: 客户端“创建实验”功能的通信逻辑已修复。实验管理模块的完整CRUD通信标准已定义完毕。
+- **后续步骤**: 基于新定义的标准，继续实现实验管理模块的“获取列表”、“更新”和“删除”功能。

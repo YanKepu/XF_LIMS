@@ -41,7 +41,7 @@
 
 实验数据将在数据库中以如下结构存储：
 
-```
+```sql
 TABLE experiments (
     id VARCHAR(36) PRIMARY KEY,      -- 实验的唯一标识符 (UUID)
     name VARCHAR(255) NOT NULL,      -- 实验名称
@@ -54,7 +54,77 @@ TABLE experiments (
 );
 ```
 
-## 待定模块
+### 4. 客户端到服务端：获取实验列表请求 (JSON)
+
+```json
+{
+  "action": "get_experiment_list",
+  "data": {
+    "search_term": "", 
+    "page": 1,          
+    "page_size": 10     
+  }
+}
+```
+
+### 5. 服务端到客户端：获取实验列表响应 (JSON)
+
+```json
+{
+  "status": "success",
+  "message": "",
+  "data": {
+    "total": 100,
+    "experiments": [
+      {
+        "id": "uuid-1",
+        "name": "实验A",
+        "status": "进行中",
+        "start_date": "2026-03-01",
+        "end_date": "2026-04-01",
+        "owner": "张三"
+      }
+    ]
+  }
+}
+```
+
+### 6. 客户端到服务端：更新实验请求 (JSON)
+
+```json
+{
+  "action": "update_experiment",
+  "data": {
+    "id": "uuid-to-update", 
+    "experiment_name": "更新后的实验名称",
+    "experiment_goal": "更新后的实验目标"
+  }
+}
+```
+
+### 7. 客户端到服务端：删除实验请求 (JSON)
+
+```json
+{
+  "action": "delete_experiment",
+  "data": {
+    "ids": ["uuid-1", "uuid-2"] 
+  }
+}
+```
+
+### 8. 通用成功/失败响应 (JSON)
+
+对于更新、删除等没有复杂数据返回的操作，服务端将返回一个通用的响应。
+
+```json
+{
+  "status": "success", 
+  "message": "操作成功完成" 
+}
+```
+
+## 实验管理模块
 
 ### 样本管理模块
 
