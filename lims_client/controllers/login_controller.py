@@ -4,6 +4,7 @@ from common.tcp_client import tcp_client
 from models.user import User ,AESCrypto,PasswordCrypto, Argon2Crypto
 from views.login_view import LoginView
 from views.main_window import MainWindow
+from controllers.experiment_controller import ExperimentController
 
 # AES密钥（建议生产环境从配置文件读取，权限600）
 AES_KEY = b"0123456789ABCDEF0123456789ABCDEF"  # 32字节（256位）
