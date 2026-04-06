@@ -40,7 +40,7 @@
 #include "business/CommandRouter.h"
 #include "business/abstract/ICommandHandler.h"
 #include "business/handler/UserLoginHandler.h"
-#include "business/handler/ExperimentCreateHandler.h" // Include ExperimentCreateHandler
+#include "business/handler/ExperimentHandler.h" // Include ExperimentHandler
 #include "business/handler/UserRegisterHandler.h" // Include UserRegisterHandler
 
 // 全局退出标志
@@ -69,7 +69,7 @@ int main(int argc, char**argv) {
 
         // 2. 🔥 主动注册所有业务处理器（顺序可控，无依赖风险）
         business::CommandRouter::instance().registerHandler<business::handler::UserLoginHandler>();
-        business::CommandRouter::instance().registerHandler<ExperimentCreateHandler>(); // Register new handler
+        business::CommandRouter::instance().registerHandler<business::handler::ExperimentHandler>(); // Register new handler
         business::CommandRouter::instance().registerHandler<business::handler::UserRegisterHandler>();
 
         // 新增模块时，只需加一行注册代码：

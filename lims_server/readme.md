@@ -10,6 +10,7 @@
 |公共模块（Common） |	工具类（日志、配置、JWT 认证等）|	POCO Util（配置）、libjwt（令牌生成）|
 
 ## 代码架构
+```
 lims_server/
 ├── include/                  # 头文件
 │   ├── network/              # 通信层头文件
@@ -18,52 +19,71 @@ lims_server/
 │   ├── service/              # 业务逻辑层头文件
 │   │   ├── AuthService.h     # 认证服务
 │   │   ├── SampleService.h   # 样品服务
-│   │   └── TaskService.h     # 任务服务
+│   │   ├── TaskService.h     # 任务服务
+│   │   └── ExperimentService.h # 实验服务
 │   ├── dao/                  # 数据访问层头文件
 │   │   ├── UserDAO.h         # 用户数据操作
 │   │   ├── SampleDAO.h       # 样品数据操作
+│   │   ├── ExperimentDAO.h   # 实验数据操作
 │   │   └── DBConnection.h    # 数据库连接封装
+│   ├── business/             # 业务层（抽象+具体业务模块）
+│   │   ├── abstract/         # 抽象层（统一接口层）
+│   │   │   └── ICommandHandler.h  # 命令处理抽象接口
+│   │   ├── handler/          # 具体业务处理器（按模块聚合）
+│   │   │   ├── UserLoginHandler.h     # 用户登录处理器
+│   │   │   ├── UserRegisterHandler.h  # 用户注册处理器
+│   │   │   └── ExperimentHandler.h    # 实验管理处理器（集成create/list/update/delete）
+│   │   └── CommandRouter.h   # 路由注册器（依赖抽象接口，不依赖具体处理器）
 │   └── common/               # 公共模块头文件
 │       ├── Config.h          # 配置读取
 │       ├── Logger.h          # 日志工具
 │       └── JwtUtil.h         # JWT令牌工具
 ├── src/                      # 源文件（对应include目录）
-|   ├── network/               # 通信层实现
-|   │   ├── TcpServer.cpp      # TCP服务器实现，处理连接管理
-    │   └── MessageHandler.cpp # 消息处理器实现，解析请求并分发到对应服务
-    ├── service/               # 业务逻辑层实现
-    │   ├── AuthService.cpp    # 认证服务实现（登录、权限验证等）
-    │   ├── SampleService.cpp  # 样品服务实现（样品登记、状态更新等）
-    │   └── TaskService.cpp    # 任务服务实现（任务创建、分配、跟踪等）
-    ├── dao/                   # 数据访问层实现
-    │   ├── UserDAO.cpp        # 用户数据操作实现
-    │   ├── SampleDAO.cpp      # 样品数据操作实现
-    │   └── DBConnection.cpp   # 数据库连接管理实现
-    |—— business               # 业务层（抽象+具体业务模块）
-    |   |—— abstract            # 抽象层（统一接口层）
-    |   |   └── ICommandHandler.h  # 命令处理抽象接口
-    |   |—— handler             # 具体业务处理器（实现抽象接口）
-    |   ├── UserLoginHandler.h
-    │   │   ├── UserRegisterHandler.h
-    │   │   └── ...
-    │   └── CommandRouter.h    // 路由注册器（依赖抽象接口，不依赖具体处理器）
-    ├── common/                # 公共模块实现
-    │   ├── Config.cpp         # 配置读取实现（从server.conf加载配置）
-    │   ├── Logger.cpp         # 日志工具实现（文件日志、控制台日志）
-    │   └── JwtUtil.cpp        # JWT令牌工具实现（生成、验证令牌）
-└── main.cpp               # 程序入口，初始化各模块并启动服务
+│   ├── network/              # 通信层实现
+│   │   ├── TcpServer.cpp     # TCP服务器实现，处理连接管理
+│   │   └── MessageHandler.cpp # 消息处理器实现，解析请求并分发到对应服务
+│   ├── service/              # 业务逻辑层实现
+│   │   ├── AuthService.cpp   # 认证服务实现（登录、权限验证等）
+│   │   ├── SampleService.cpp # 样品服务实现（样品登记、状态更新等）
+│   │   ├── TaskService.cpp   # 任务服务实现（任务创建、分配、跟踪等）
+│   │   └── ExperimentService.cpp # 实验服务实现
+│   ├── dao/                  # 数据访问层实现
+│   │   ├── UserDAO.cpp       # 用户数据操作实现
+│   │   ├── SampleDAO.cpp     # 样品数据操作实现
+│   │   ├── ExperimentDAO.cpp # 实验数据操作实现
+│   │   └── DBConnection.cpp  # 数据库连接管理实现
+│   ├── business/             # 业务层实现
+│   │   ├── CommandRouter.cpp # 路由注册器实现
+│   │   └── handler/          # 业务处理器实现
+│   │       ├── UserLoginHandler.cpp     # 用户登录处理器实现
+│   │       ├── UserRegisterHandler.cpp  # 用户注册处理器实现
+│   │       └── ExperimentHandler.cpp    # 实验管理处理器实现
+│   ├── common/               # 公共模块实现
+│   │   ├── Config.cpp        # 配置读取实现（从server.conf加载配置）
+│   │   ├── Logger.cpp        # 日志工具实现（文件日志、控制台日志）
+│   │   └── JwtUtil.cpp       # JWT令牌工具实现（生成、验证令牌）
+├── main.cpp                  # 程序入口，初始化各模块并启动服务
 ├── config/                   # 配置文件
 │   └── server.conf           # 服务器配置（端口、数据库地址等）
 ├── sql/                      # 数据库初始化脚本
-│   └── init_db.sql           # 创建表结构
+│   └── init.sql              # 创建表结构
 ├── CMakeLists.txt            # 编译配置
-└── main.cpp                  # 程序入口
+└── readme.md                 # 项目说明文档
+```
 
-
-客户端请求 → MessageHandler（网络层）→ UserLoginHandler（business层）→ UserDAO（DAO层）→ 数据库
-                                  ↑                ↑                ↑
-                                  |                |                |
-                           业务逻辑判断     数据读写（无业务）     存储数据
+```
+客户端请求 → MessageHandler（网络层）→ 业务处理器（business层）→ 服务层（Service）→ DAO层 → 数据库
+                                  ↑                ↑                ↑                ↑                ↑
+                                  |                |                |                |                |
+                           请求解析与路由     模块业务逻辑     核心业务逻辑     数据读写（无业务）     存储数据
+```
+**示例流程**：
+- 登录请求：MessageHandler → UserLoginHandler → AuthService → UserDAO → 数据库
+- 实验管理：MessageHandler → ExperimentHandler → ExperimentService → ExperimentDAO → 数据库
+  - 创建实验：action = create_experiment
+  - 获取列表：action = get_experiment_list
+  - 更新实验：action = update_experiment
+  - 删除实验：action = delete_experiment
 
 ## 基础开发工具
 工具 / 环境	用途	安装命令（apt）	

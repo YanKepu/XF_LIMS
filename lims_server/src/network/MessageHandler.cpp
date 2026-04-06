@@ -208,6 +208,15 @@ ProcessResult MessageHandler::processData(const json& reqJson, json& response) {
         /* 从请求Json中获取业务字段（nlohmann::json支持直接[]访问，自动类型转换 */
         std::string cmd = reqJson["cmd"];
         json reqData = reqJson["data"]; // 传给业务接口的具体数据（如 {"username":"admin", "password":"123456"}）
+        
+        // 对于模块级Handler，确保data中包含action字段
+        if (cmd == "experiment" && !reqData.contains("action")) {
+            result.successflag = false;
+            result.code = 400;
+            result.msg = "实验模块请求缺少action字段";
+            common::Logger::getLogger().error("请求参数异常：%s", reqJson.dump().c_str());
+            return result;
+        }
 
         // -------------- 第二步：调用路由器获取对应的业务处理器 --------------
         // 路由器是单例，通过 cmd 查找绑定的处理器（如 cmd="user_login" → UserLoginHandler）
