@@ -7,7 +7,7 @@ bool UserDAO::existsByUsername(const std::string& username) {
     try {
         dbConn = DBConnection::getConnection(); // 复用你的DBConnection获取连接
         pqxx::work tx(*dbConn);
-        std::string sql = "SELECT 1 FROM \"user\" WHERE username = $1 LIMIT 1"; // 注意user是关键字，加引号
+        std::string sql = "SELECT 1 FROM users WHERE username = $1 LIMIT 1";
         pqxx::result res = tx.exec_params(sql, username);
         tx.commit();
         return !res.empty();
@@ -23,7 +23,7 @@ void UserDAO::insertUser(const User& user) {
         dbConn = DBConnection::getConnection();
         pqxx::work tx(*dbConn);
         std::string sql = R"(
-            INSERT INTO "user" (username, password, phone, status, create_time)
+            INSERT INTO users (username, password, phone, status, create_time)
             VALUES ($1, $2, $3, $4, $5)
         )";
         tx.exec_params(
@@ -49,7 +49,7 @@ User UserDAO::findByUsername(const std::string& username) {
         pqxx::work tx(*dbConn);
         std::string sql = R"(
             SELECT id, username, password, phone, status, create_time
-            FROM "user" WHERE username = $1
+            FROM users WHERE username = $1
         )";
         pqxx::result res = tx.exec_params(sql, username);
         tx.commit();

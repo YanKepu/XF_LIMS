@@ -10,8 +10,9 @@
 
 ```json
 {
-  "action": "create_experiment",
+  "cmd": "experiment",
   "data": {
+    "action": "create_experiment",
     "experiment_name": "",      // 实验名称 (字符串，必填)
     "experiment_goal": "",      // 实验目标 (字符串，必填)
     "start_date": "",         // 开始日期 (字符串，格式: YYYY-MM-DD，必填)
@@ -19,6 +20,7 @@
     "description": "",        // 实验描述 (字符串，可选)
     "status": ""              // 实验状态 (字符串，例如: "草稿", "进行中", "已完成", "暂停"，必填)
   }
+  "timestamp": "2026-03-01 10:00:00"  // 请求时间戳 (字符串，格式: YYYY-MM-DD HH:MM:SS)
 }
 ```
 

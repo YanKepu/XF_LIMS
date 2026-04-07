@@ -42,6 +42,7 @@
 #include "business/handler/UserLoginHandler.h"
 #include "business/handler/ExperimentHandler.h" // Include ExperimentHandler
 #include "business/handler/UserRegisterHandler.h" // Include UserRegisterHandler
+#include "business/handler/SampleHandler.h" // Include SampleHandler
 
 // 全局退出标志
 static volatile bool g_quit = false;
@@ -71,6 +72,7 @@ int main(int argc, char**argv) {
         business::CommandRouter::instance().registerHandler<business::handler::UserLoginHandler>();
         business::CommandRouter::instance().registerHandler<business::handler::ExperimentHandler>(); // Register new handler
         business::CommandRouter::instance().registerHandler<business::handler::UserRegisterHandler>();
+        business::CommandRouter::instance().registerHandler<business::handler::SampleHandler>(); // Register SampleHandler
 
         // 新增模块时，只需加一行注册代码：
         // business::CommandRouter::instance().registerHandler<business::handler::OrderQueryHandler>();
