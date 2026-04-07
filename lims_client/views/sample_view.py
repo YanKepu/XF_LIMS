@@ -4,10 +4,12 @@ from PySide6.QtWidgets import (
     QFormLayout, QLineEdit, QPushButton, QTableWidget,
     QHeaderView, QAbstractItemView, QDateEdit, QTextEdit, QComboBox, QTableWidgetItem, QStackedWidget
 )
-from PySide6.QtCore import Qt, QDate
+from PySide6.QtCore import Qt, QDate, Signal
 
 class SampleView(QWidget):
     """样本管理视图"""
+    register_sample_signal = Signal(dict)
+    
     def __init__(self):
         super().__init__()
         self.main_layout = QVBoxLayout(self)
@@ -16,6 +18,9 @@ class SampleView(QWidget):
 
         self._setup_sample_list_view()
         self._setup_sample_registration_view()
+        
+        # Connect register button to signal
+        self.register_sample_button.clicked.connect(self._on_register_sample_clicked)
 
         # Set initial view to sample list
         self.stacked_widget.setCurrentWidget(self.sample_list_container)
@@ -121,4 +126,45 @@ class SampleView(QWidget):
         self.stacked_widget.setCurrentWidget(self.sample_registration_container)
 
     def _show_sample_list_view(self):
+        self.stacked_widget.setCurrentWidget(self.sample_list_container)
+    
+    def _on_register_sample_clicked(self):
+        """Handle register sample button click"""
+        data = {
+            "code": self.sample_id_input.text(),
+            "name": self.sample_type_combo.currentText(),
+            "customer": self.sample_source_input.text(),
+            "status": "New"
+        }
+        self.register_sample_signal.emit(data)
+    
+    def clear_form(self):
+        """Clear all form fields"""
+        self.sample_id_input.clear()
+        self.sample_type_combo.setCurrentIndex(0)
+        self.sample_source_input.clear()
+        self.sample_quantity_input.clear()
+        self.storage_location_input.clear()
+        self.collection_date_edit.setDate(QDate.currentDate())
+        self.associated_experiment_input.clear()
+        self.sample_remarks_input.clear()
+    
+    def show_message(self, title, message, msg_type='information'):
+        """Show message dialog"""
+        from PySide6.QtWidgets import QMessageBox
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle(title)
+        msg_box.setText(message)
+        
+        if msg_type == 'warning':
+            msg_box.setIcon(QMessageBox.Warning)
+        elif msg_type == 'critical':
+            msg_box.setIcon(QMessageBox.Critical)
+        else:
+            msg_box.setIcon(QMessageBox.Information)
+            
+        msg_box.exec()
+    
+    def switch_to_list_view(self):
+        """Switch back to list view"""
         self.stacked_widget.setCurrentWidget(self.sample_list_container)
