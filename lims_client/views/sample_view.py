@@ -54,23 +54,6 @@ class SampleView(QWidget):
         self.sample_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.sample_table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        # Placeholder data
-        self.sample_table.insertRow(0)
-        self.sample_table.setItem(0, 0, QTableWidgetItem("S001"))
-        self.sample_table.setItem(0, 1, QTableWidgetItem("血液"))
-        self.sample_table.setItem(0, 2, QTableWidgetItem("患者A"))
-        self.sample_table.setItem(0, 3, QTableWidgetItem("5ml"))
-        self.sample_table.setItem(0, 4, QTableWidgetItem("冰箱1, 架2"))
-        self.sample_table.setItem(0, 5, QTableWidgetItem("可用"))
-
-        self.sample_table.insertRow(1)
-        self.sample_table.setItem(1, 0, QTableWidgetItem("S002"))
-        self.sample_table.setItem(1, 1, QTableWidgetItem("组织"))
-        self.sample_table.setItem(1, 2, QTableWidgetItem("小鼠B"))
-        self.sample_table.setItem(1, 3, QTableWidgetItem("1g"))
-        self.sample_table.setItem(1, 4, QTableWidgetItem("液氮罐3"))
-        self.sample_table.setItem(1, 5, QTableWidgetItem("已使用"))
-
         sample_list_layout.addWidget(self.sample_table)
         container_layout.addWidget(sample_list_group_box)
         self.stacked_widget.addWidget(self.sample_list_container)
@@ -87,7 +70,7 @@ class SampleView(QWidget):
         sample_registration_layout.addRow("样本ID:", self.sample_id_input)
 
         self.sample_type_combo = QComboBox()
-        self.sample_type_combo.addItems(["血液", "尿液", "组织", "DNA", "RNA"])
+        self.sample_type_combo.addItems(["插接件", "线束", "连接器", "其他"])
         sample_registration_layout.addRow("样本类型:", self.sample_type_combo)
 
         self.sample_source_input = QLineEdit()

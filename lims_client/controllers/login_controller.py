@@ -5,6 +5,7 @@ from models.user import User ,AESCrypto,PasswordCrypto, Argon2Crypto
 from views.login_view import LoginView
 from views.main_window import MainWindow
 from controllers.experiment_controller import ExperimentController
+from controllers.sample_controller import SampleController
 
 # AES密钥（建议生产环境从配置文件读取，权限600）
 AES_KEY = b"0123456789ABCDEF0123456789ABCDEF"  # 32字节（256位）
@@ -65,6 +66,7 @@ class LoginController:
 
                 # 为主窗口中的视图创建并绑定控制器
                 self.experiment_controller = ExperimentController(self.main_window.experiment_view)
+                self.sample_controller = SampleController(self.main_window.sample_view)
 
                 self.main_window.show()
             else:
