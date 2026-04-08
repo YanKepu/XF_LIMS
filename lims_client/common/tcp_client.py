@@ -41,10 +41,8 @@ class LimsTCPClient:
 
         # 封装请求体
         request = {
-                "version":"v1.0",
-                "cmd": cmd,
-                "data": data,
-                "timestamp": datetime.datetime.now(datetime.timezone.utc)       # 用utc的时间格式
+            "cmd": cmd,
+            "data": data
         }
 
         try:
