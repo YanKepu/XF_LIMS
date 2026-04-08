@@ -42,6 +42,25 @@ public:
         }
         return samples;
     }
+
+    // 搜索样品
+    std::vector<Sample> searchSamples(const std::string& searchTerm) {
+        auto conn = DBConnection::getConnection();
+        pqxx::nontransaction txn(*conn);
+        std::string query = "SELECT code, name, customer, status FROM samples WHERE code LIKE $1 OR name LIKE $1 OR customer LIKE $1";
+        pqxx::result res = txn.exec_params(query, "%" + searchTerm + "%");
+        
+        std::vector<Sample> samples;
+        for (const auto& row : res) {
+            samples.emplace_back(
+                row["code"].as<std::string>(),
+                row["name"].as<std::string>(),
+                row["customer"].as<std::string>(),
+                row["status"].as<std::string>()
+            );
+        }
+        return samples;
+    }
 };
 
 #endif // SAMPLE_DAO_H

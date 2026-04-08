@@ -17,7 +17,7 @@ public:
     nlohmann::json registerSample(const nlohmann::json& data);
 
     // 获取样品列表
-    nlohmann::json getSampleList();
+    nlohmann::json getSampleList(const nlohmann::json& data);
 };
 
 #endif // SAMPLE_SERVICE_H

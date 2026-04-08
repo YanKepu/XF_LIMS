@@ -17,16 +17,24 @@ nlohmann::json SampleService::registerSample(const nlohmann::json& data) {
 
         // 3. 调用DAO保存
         sampleDAO.addSample(sample);
-        return {{"code", 200}, {"msg", "样品登记成功"}, {"data", {"sample_id", sample.getCode()}}};
+        return {{"code", 200}, {"msg", "样品登记成功"}, {"data", {{"sample_id", sample.getCode()}}}};
     } catch (const std::exception& e) {
         common::Logger::getLogger().error("样品登记失败: %s", e.what());
         return {{"code", 500}, {"msg", "服务器错误: " + std::string(e.what())}};
     }
 }
 
-nlohmann::json SampleService::getSampleList() {
+nlohmann::json SampleService::getSampleList(const nlohmann::json& data) {
     try {
-        std::vector<Sample> samples = sampleDAO.getSamples();
+        std::vector<Sample> samples;
+        std::string searchTerm = data.contains("search_term") ? data["search_term"].get<std::string>() : "";
+        
+        if (!searchTerm.empty()) {
+            samples = sampleDAO.searchSamples(searchTerm);
+        } else {
+            samples = sampleDAO.getSamples();
+        }
+        
         nlohmann::json sampleList = nlohmann::json::array();
         for (const auto& s : samples) {
             sampleList.push_back({

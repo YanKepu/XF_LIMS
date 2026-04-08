@@ -82,7 +82,7 @@ ProcessResult SampleHandler::handleList(const json& reqData, json& response) {
 
     try {
         SampleService service;
-        nlohmann::json serviceResponse = service.getSampleList();
+        nlohmann::json serviceResponse = service.getSampleList(reqData);
         
         if (serviceResponse["code"] == 200) {
             common::Logger::getLogger().information("SampleHandler", "获取样品列表成功");
