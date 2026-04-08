@@ -2,7 +2,6 @@
 import socket
 import datetime
 from typing import Dict, Any
-from loguru import logger
 from config.config import config
 from common.json_utils import json_serialize, json_deserialize
 
@@ -21,10 +20,10 @@ class LimsTCPClient:
             self.socket.settimeout(config.TCP_TIMEOUT)
             self.socket.connect((self.host, self.port))
             self.connected = True
-            logger.info(f"成功连接到服务器 {self.host}:{self.port}")
+            print(f"成功连接到服务器 {self.host}:{self.port}")
             return True
         except Exception as e:
-            logger.error(f"连接服务器失败: {e}")
+            print(f"连接服务器失败: {e}")
             self.connected = False
             return False
 
@@ -36,10 +35,8 @@ class LimsTCPClient:
         :return: 服务器响应数据
         """
         # 1. 每次请求都新建Socket（核心：不复用旧连接）
-
-        tcp_client.connect()
-
-        if not self.connected and not self.connect():
+        self.close()  # 先关闭旧连接
+        if not self.connect():
             raise ConnectionError("未连接到服务器")
 
         # 封装请求体
@@ -54,7 +51,7 @@ class LimsTCPClient:
             # 发送数据（UTF-8编码）
             send_data = json_serialize(request) + "\n"  # 换行符作为消息结束符
             self.socket.sendall(send_data.encode("utf-8"))
-            logger.debug(f"发送请求: {send_data.strip()}")
+            print(f"发送请求: {send_data.strip()}")
 
             # 接收响应（按行读取）
             recv_data = b""
@@ -68,11 +65,11 @@ class LimsTCPClient:
 
             # 解析响应
             response = json_deserialize(recv_data.decode("utf-8").strip())
-            logger.debug(f"接收响应: {response}")
+            print(f"接收响应: {response}")
             return response
 
         except Exception as e:
-            logger.error(f"请求发送失败: {e}")
+            print(f"请求发送失败: {e}")
             self.connected = False
             raise
 
@@ -81,7 +78,7 @@ class LimsTCPClient:
         if self.socket:
             self.socket.close()
             self.connected = False
-            logger.info("已断开与服务器的连接")
+            print("已断开与服务器的连接")
 
 # 单例模式（全局唯一TCP客户端）
 tcp_client = LimsTCPClient()

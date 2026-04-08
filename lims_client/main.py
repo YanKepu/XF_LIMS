@@ -1,7 +1,6 @@
 # main.py
 import sys
 
-from loguru import logger
 from PySide6.QtWidgets import QApplication ,QMessageBox
 from PySide6.QtCore import Qt, Signal, QMessageLogContext
 from PySide6.QtGui import QIcon
@@ -11,36 +10,16 @@ from common.tcp_client import tcp_client
 from views.login_view import LoginView
 from controllers.login_controller import LoginController
 
-def setup_logger():
-    """初始化日志"""
-    logger.remove()  # 移除默认日志配置
-    # 添加文件日志
-    logger.add(
-        config.LOG_PATH,
-        level=config.LOG_LEVEL,
-        rotation="100MB",
-        retention="7 days",
-        encoding="utf-8"
-    )
-    # 添加控制台日志
-    logger.add(
-        sys.stdout,
-        level=config.LOG_LEVEL,
-        colorize=True
-    )
-
 def main():
     """主函数"""
-    # 初始化日志
-    setup_logger()
-    logger.info("LIMS客户端启动")
+    print("LIMS客户端启动")
 
     # 创建Qt应用
     app = QApplication(sys.argv)
     app.setStyle("Fusion")  # 设置统一样式
 
     # 创建TCP client去连接服务端
-    logger.info("尝试连接LIMS服务器...")
+    print("尝试连接LIMS服务器...")
     connect_success = tcp_client.connect()
     if not connect_success:
         # 连接失败弹窗提示
@@ -66,7 +45,7 @@ def main():
     # 程序退出处理
     def exit_handler():
         tcp_client.close()
-        logger.info("LIMS客户端退出")
+        print("LIMS客户端退出")
 
     app.aboutToQuit.connect(exit_handler)
 

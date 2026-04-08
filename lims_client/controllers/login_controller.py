@@ -1,5 +1,4 @@
 # controllers/login_controller.py
-from loguru import logger
 from common.tcp_client import tcp_client
 from models.user import User ,AESCrypto,PasswordCrypto, Argon2Crypto
 from views.login_view import LoginView
@@ -58,8 +57,8 @@ class LoginController:
                     role = username # user_data.get("role")
                 )
 
-                # logger.info(f"用户 {username} 登录成功")
-                logger.info(f"用户 {username} (角色: {user.role}) 登录成功")
+                # print(f"用户 {username} 登录成功")
+                print(f"用户 {username} (角色: {user.role}) 登录成功")
                 # 关闭登录窗口，打开主窗口
                 self.login_view.close()
                 self.main_window = MainWindow(user)
@@ -75,7 +74,7 @@ class LoginController:
         except ConnectionError as e:
             self.login_view.show_error(f"网络错误：{str(e)}")
         except Exception as e:
-            logger.error(f"登录异常：{e}")
+            print(f"登录异常：{e}")
             self.login_view.show_error(f"系统异常：{str(e)}")
 
     def handle_register(self, username: str, password: str):
